@@ -47,7 +47,7 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
         $has_access = true;
     }
 
-    if( $restricted_to && ! $has_access ) {
+    if( $restricted_to && is_array( $restricted_to ) && ! $has_access ) {
 
         foreach( $restricted_to as $item => $data ) {
 
