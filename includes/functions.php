@@ -62,7 +62,7 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
             }
 
             // If restricted to any customer and user has purchased something
-            if( 'any' === $data['download'] && edd_has_purchases( $user_id ) ) {
+            if( 'any' === $data['download'] && edd_has_purchases( $user_id ) && is_user_logged_in() ) {
                 $has_access  = true;
                 break;
             } elseif( 'any' === $data['download'] ) {

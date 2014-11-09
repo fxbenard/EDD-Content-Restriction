@@ -25,15 +25,39 @@ function edd_cr_can_view_bbpress() {
 
     if( ! current_user_can( 'moderate' ) ) {
 
-        $restricted_to    = edd_cr_is_restricted( bbp_get_topic_id() );
-        $restricted_id    = bbp_get_topic_id();
+        $restricted_to = edd_cr_is_restricted( bbp_get_topic_id() );
+        $restricted_id = bbp_get_topic_id();
 
         if( ! $restricted_to ) {
+
             $restricted_to = edd_cr_is_restricted( bbp_get_forum_id() ); // check for parent forum restriction
             $restricted_id = bbp_get_forum_id();
+
+            if( ! $restricted_to ) {
+
+                $ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
+
+                if ( ! empty( $ancestors ) ) {
+
+                    // Loop through parents
+                    foreach ( (array) $ancestors as $parent_id ) {
+
+                        $restricted_to = edd_cr_is_restricted( $parent_id );
+                        $restricted_id = $parent_id;
+
+                        if( $restricted_to ) {
+                            break;
+                        }
+
+                    }
+
+                }
+
+            }
+
         }
 
-        $has_access = edd_cr_user_can_access( $user_ID, $restricted_to );
+        $has_access = edd_cr_user_can_access( $user_ID, $restricted_to, $restricted_id );
 
         if( $has_access['status'] == false ) {
             $return = false;
@@ -55,9 +79,33 @@ function edd_cr_filter_bbp_topics_list( $has_topics, $query ) {
     global $user_ID;
 
     if( ! current_user_can( 'moderate' ) ) {
+
         if( bbp_is_single_forum() ) {
-            $restricted_to  = edd_cr_is_restricted( bbp_get_forum_id() );
-            $has_access     = edd_cr_user_can_access( $user_ID, $restricted_to );
+
+            $restricted_to = edd_cr_is_restricted( bbp_get_forum_id() );
+
+            if( ! $restricted_to ) {
+
+                $ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
+
+                if ( ! empty( $ancestors ) ) {
+
+                    // Loop through parents
+                    foreach ( (array) $ancestors as $parent_id ) {
+
+                        $restricted_to = edd_cr_is_restricted( $parent_id );
+
+                        if( $restricted_to ) {
+                            break;
+                        }
+
+                    }
+
+                }
+
+            }
+
+            $has_access = edd_cr_user_can_access( $user_ID, $restricted_to );
 
             if( $has_access['status'] == false ) {
                 $has_topics = false;
@@ -90,8 +138,31 @@ function edd_cr_filter_replies( $content, $reply_id ) {
         $restricted_id    = bbp_get_topic_id();
 
         if( ! $restricted_to ) {
+
             $restricted_to = edd_cr_is_restricted( bbp_get_forum_id() ); // check for parent forum restriction
             $restricted_id = bbp_get_forum_id();
+
+            if( ! $restricted_to ) {
+
+                $ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
+
+                if ( ! empty( $ancestors ) ) {
+
+                    // Loop through parents
+                    foreach ( (array) $ancestors as $parent_id ) {
+
+                        $restricted_to = edd_cr_is_restricted( $parent_id );
+
+                        if( $restricted_to ) {
+                            break;
+                        }
+
+                    }
+
+                }
+
+            }
+
         }
 
         $has_access = edd_cr_user_can_access( $user_ID, $restricted_to, $restricted_id );
@@ -122,7 +193,29 @@ function edd_cr_hide_new_topic_form( $form ) {
     if( ! current_user_can( 'moderate' ) ) {
         $restricted_to  = edd_cr_is_restricted( bbp_get_forum_id() ); // Check for parent forum restriction
         $restricted_id  = bbp_get_forum_id();
-        $has_access     = edd_cr_user_can_access( $user_ID, $restricted_to, $restricted_id );
+
+        if( ! $restricted_to ) {
+
+            $ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
+
+            if ( ! empty( $ancestors ) ) {
+
+                // Loop through parents
+                foreach ( (array) $ancestors as $parent_id ) {
+
+                    $restricted_to = edd_cr_is_restricted( $parent_id );
+
+                    if( $restricted_to ) {
+                        break;
+                    }
+
+                }
+
+            }
+
+        }
+
+        $has_access = edd_cr_user_can_access( $user_ID, $restricted_to, $restricted_id );
 
         $return = ( $has_access['status'] == false ) ? false : true;
     } else {
@@ -151,6 +244,28 @@ function edd_cr_hide_new_replies_form( $form ) {
         if( ! $restricted_to ) {
             $restricted_to = edd_cr_is_restricted( bbp_get_forum_id() ); // check for parent forum restriction
             $restricted_id = bbp_get_forum_id();
+
+            if( ! $restricted_to ) {
+
+                $ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
+
+                if ( ! empty( $ancestors ) ) {
+
+                    // Loop through parents
+                    foreach ( (array) $ancestors as $parent_id ) {
+
+                        $restricted_to = edd_cr_is_restricted( $parent_id );
+
+                        if( $restricted_to ) {
+                            break;
+                        }
+
+                    }
+
+                }
+
+            }
+
         }
 
         $has_access = edd_cr_user_can_access( $user_ID, $restricted_to );
