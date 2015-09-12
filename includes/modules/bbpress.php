@@ -230,14 +230,15 @@ add_filter( 'bbp_current_user_can_access_create_topic_form', 'edd_cr_hide_new_to
 /**
  * Hides the new reply form
  *
- * @param       string $form The new reply form
+ * @param       bool $retval The current state of this permission check
  * @global      int $user_ID The ID of the current user
  * @return      mixed $return
  */
-function edd_cr_hide_new_replies_form( $form ) {
+function edd_cr_hide_new_replies_form( $retval ) {
+
 	global $user_ID;
 
-	if( ! current_user_can( 'moderate' ) ) {
+	if( ! current_user_can( 'moderate' ) && bbp_current_user_can_publish_replies() ) {
 		$restricted_to = edd_cr_is_restricted( bbp_get_topic_id() );
 		$restricted_id = bbp_get_topic_id();
 
@@ -270,12 +271,13 @@ function edd_cr_hide_new_replies_form( $form ) {
 
 		$has_access = edd_cr_user_can_access( $user_ID, $restricted_to );
 
-		$return = ( $has_access['status'] == false ) ? false : true;
-	} else {
-		$return = $form;
+		if ( $has_access['status'] ) {
+			$retval = true;
+		}
+
 	}
 
-	return $return;
+	return $retval;
 }
 add_filter( 'bbp_current_user_can_access_create_reply_form', 'edd_cr_hide_new_replies_form' );
 add_filter( 'bbp_current_user_can_access_create_topic_form', 'edd_cr_hide_new_replies_form' ); // this is required for it to work with the default theme
