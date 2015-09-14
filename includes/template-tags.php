@@ -3,7 +3,7 @@
 /**
  * Template Tags
  *
- * @package     EDD\ContentRestriction\Shortcodes
+ * @package     EDD\ContentRestriction\TemplateTags
  * @copyright   Copyright (c) 2013-2014, Pippin Williamson
  * @since       2.1
  */
