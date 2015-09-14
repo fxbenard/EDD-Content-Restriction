@@ -66,7 +66,6 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 				$has_access  = true;
 				break;
 			} elseif( 'any' === $data['download'] ) {
-				$products[0] = __( 'any product', 'edd-cr' );
 				$has_access  = false;
 				break;
 			}
@@ -106,27 +105,31 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 		if( $has_access == false ) {
 
 			if( $restricted_count > 1 ) {
-
-				$message  = __( 'This content is restricted to buyers of:', 'edd-cr' );
+				$message = edd_cr_get_single_restriction_message();
+				$product_list = '';
 
 				if( ! empty( $products ) ) {
 
-					$message .= '<ul>';
+					$product_list .= '<ul>';
 
 					foreach( $products as $id => $product ) {
-						$message .= '<li>' . $product . '</li>';
+						$product_list .= '<li>' . $product . '</li>';
 					}
 
-					$message .= '</ul>';
+					$product_list .= '</ul>';
 
 				}
 
+				$message = str_replace( '{product_names', $product_list, $message );
+
 			} else {
 
-				$message = sprintf(
-					__( 'This content is restricted to buyers of %s.', 'edd-cr' ),
-					$products[0]
-				);
+				if ( 'any' === $data['download'] ) {
+					$message = edd_cr_get_any_restriction_message();
+				} else {
+					$message = edd_cr_get_single_restriction_message();
+					$message = str_replace( '{product_name}', $products[0], $message );
+				}
 
 			}
 
@@ -353,4 +356,49 @@ function edd_cr_get_restricted_pages( $payment_id = 0 ) {
 	}
 
 	return $posts;
+}
+
+/**
+ * Get the message to display to people who have not purchased the necessary product to view the content
+ *
+ * @since  2.1
+ * @return string The message for non-purchases of a product
+ */
+function edd_cr_get_single_restriction_message() {
+	$default_message = sprintf( __( 'This content is restricted to buyers of %s.', 'edd-cr' ), '{product_name}' );
+	$saved_message   = edd_get_option( 'edd_cr_single_resriction_message', false );
+
+	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
+
+	return $message;
+}
+
+/**
+ * Get the message to display to people who have not purchased the necessary product(s) to view the content
+ *
+ * @since  2.1
+ * @return string The message for non-purchases of the products
+ */
+function edd_cr_get_multi_restriction_message() {
+	$default_message = sprintf( __( 'This content is restricted to buyers of:' . "\n\n" . '%s', 'edd-cr' ), '{product_names}' );
+	$saved_message   = edd_get_option( 'edd_cr_multi_resriction_message', false );
+
+	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
+
+	return $message;
+}
+
+/**
+ * Get the message to display to people who have not purchased any products
+ *
+ * @since  2.1
+ * @return string The message for non-purchases
+ */
+function edd_cr_get_any_restriction_message() {
+	$default_message = __( 'If you want to view this content, you need to buy any product.' );
+	$saved_message   = edd_get_option( 'edd_cr_any_resriction_message', false );
+
+	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
+
+	return $message;
 }
