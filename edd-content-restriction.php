@@ -197,7 +197,7 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 				array(
 					'id'          => 'edd_cr_any_resriction_message',
 					'name'        => __( 'Restriction for "Any Product"', 'edd-cr' ),
-					'desc'        => __( 'When access to content is resticted to anyone who has made a purchase, this is the message displayed to people without a purchase.', 'edd-cr' ),
+					'desc'        => __( 'When access to content is restricted to anyone who has made a purchase, this is the message displayed to people without a purchase.', 'edd-cr' ),
 					'type'        => 'rich_editor',
 					'allow_blank' => false,
 					'size'        => 5,
