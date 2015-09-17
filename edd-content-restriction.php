@@ -93,6 +93,7 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/metabox.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/scripts.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/shortcodes.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/template-tags.php';
 
 			// Check for bbPress
 			if ( class_exists( 'bbPress' ) ) {
