@@ -176,7 +176,34 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 					'name'  => __( 'Hide Menu Items', 'edd-cr' ),
 					'desc'  => __( 'Should we hide menu items a user doesn\'t have access to?', 'edd-cr' ),
 					'type'  => 'checkbox',
-				)
+				),
+				array(
+					'id'          => 'edd_cr_single_resriction_message',
+					'name'        => __( 'Single Restriction Message', 'edd-cr' ),
+					'desc'        => __( 'When access is restricted by a single product, this message will show to the user when they do not have access. <code>{product_name}</code> will be replaced by the restriction requirements.', 'edd-cr' ),
+					'type'        => 'rich_editor',
+					'allow_blank' => false,
+					'size'        => 5,
+					'std'         => edd_cr_get_single_restriction_message(),
+				),
+				array(
+					'id'          => 'edd_cr_multi_resriction_message',
+					'name'        => __( 'Multiple Restriction Message', 'edd-cr' ),
+					'desc'        => __( 'When access is restricted by multiple products, this message will show to the user when they do not have access. <code>{product_names}</code> will be replaced by a list of the restriction requirements.', 'edd-cr' ),
+					'type'        => 'rich_editor',
+					'allow_blank' => false,
+					'size'        => 5,
+					'std'         => edd_cr_get_multi_restriction_message(),
+				),
+				array(
+					'id'          => 'edd_cr_any_resriction_message',
+					'name'        => __( 'Restriction for "Any Product"', 'edd-cr' ),
+					'desc'        => __( 'When access to content is restricted to anyone who has made a purchase, this is the message displayed to people without a purchase.', 'edd-cr' ),
+					'type'        => 'rich_editor',
+					'allow_blank' => false,
+					'size'        => 5,
+					'std'         => edd_cr_get_any_restriction_message(),
+				),
 			);
 
 			$settings = array_merge( $settings, $new_settings );
