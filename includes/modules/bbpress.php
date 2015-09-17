@@ -190,7 +190,7 @@ add_filter( 'bbp_get_reply_content', 'edd_cr_filter_replies', 2, 999 );
 function edd_cr_hide_new_topic_form( $form ) {
 	global $user_ID;
 
-	if( ! current_user_can( 'moderate' ) ) {
+	if( ! current_user_can( 'moderate' ) && bbp_current_user_can_publish_topics() ) {
 		$restricted_to  = edd_cr_is_restricted( bbp_get_forum_id() ); // Check for parent forum restriction
 		$restricted_id  = bbp_get_forum_id();
 
