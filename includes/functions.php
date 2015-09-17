@@ -370,7 +370,7 @@ function edd_cr_get_single_restriction_message() {
 
 	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
 
-	return $message;
+	return wpautop( $message );
 }
 
 /**
@@ -385,7 +385,7 @@ function edd_cr_get_multi_restriction_message() {
 
 	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
 
-	return $message;
+	return wpautop( $message );
 }
 
 /**
@@ -400,5 +400,5 @@ function edd_cr_get_any_restriction_message() {
 
 	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
 
-	return $message;
+	return wpautop( $message );
 }
