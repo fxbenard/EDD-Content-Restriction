@@ -328,15 +328,18 @@ function edd_cr_get_restricted_pages( $payment_id = 0 ) {
 	$posts    = array();
 	$post_ids = array();
 	$files    = edd_get_payment_meta_downloads( $payment_id );
-	$ids      = array_unique( wp_list_pluck( $files, 'id' ) );
 
-	foreach( $ids as $download_id ) {
+	if ( ! empty( $files ) && is_array( $files ) ) {
+		$ids = array_unique( wp_list_pluck( $files, 'id' ) );
 
-		$meta = get_post_meta( $download_id, '_edd_cr_protected_post' );
-		if( $meta ) {
-			$post_ids = array_merge( $post_ids, $meta );
+		foreach( $ids as $download_id ) {
+
+			$meta = get_post_meta( $download_id, '_edd_cr_protected_post' );
+			if( $meta ) {
+				$post_ids = array_merge( $post_ids, $meta );
+			}
+
 		}
-
 	}
 
 	$post_ids = array_unique( array_map( 'absint', $post_ids ) );
