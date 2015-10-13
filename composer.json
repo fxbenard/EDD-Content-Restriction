@@ -1,0 +1,17 @@
+{
+    "name": "easydigitaldownloads/edd-content-restriction",
+    "type": "wordpress-plugin",
+    "description": "Content Restriction Extension for EDD",
+    "keywords": [ "edd", "content-restriction", "plugin"],
+    "homepage": "http://easydigitaldownloads.com",
+    "authors": [
+        {
+            "name": "Pippin Williamson",
+            "email": "pippin@pippinsplugins.com",
+            "homepage": "http://pippinsplugins.com"
+        }
+    ],
+    "require": {
+        "composer/installers": "~1.0.6"
+    }
+}

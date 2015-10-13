@@ -23,138 +23,141 @@ if( ! defined( 'ABSPATH' ) ) exit;
  */
 function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = false ) {
 
-    $has_access         = false;
-    $restricted_count   = count( $restricted_to );
-    $products           = array();
+	$has_access         = false;
+	$restricted_count   = count( $restricted_to );
+	$products           = array();
 
-    // If no user is given, use the current user
-    if( ! $user_id ) {
-        $user_id = get_current_user_id();
-    }
+	// If no user is given, use the current user
+	if( ! $user_id ) {
+		$user_id = get_current_user_id();
+	}
 
-    // bbPress specific checks. Moderators can see everything
-    if( class_exists( 'bbPress' ) && current_user_can( 'moderate' ) ) {
-        $has_access = true;
-    }
+	// bbPress specific checks. Moderators can see everything
+	if( class_exists( 'bbPress' ) && current_user_can( 'moderate' ) ) {
+		$has_access = true;
+	}
 
-    // Admins have full access
-    if( current_user_can( 'manage_options' ) ) {
-        $has_access = true;
-    }
+	// Admins have full access
+	if( current_user_can( 'manage_options' ) ) {
+		$has_access = true;
+	}
 
-    // The post author can always access
-    if( $post_id && current_user_can( 'edit_post', $post_id ) ) {
-        $has_access = true;
-    }
+	// The post author can always access
+	if( $post_id && current_user_can( 'edit_post', $post_id ) ) {
+		$has_access = true;
+	}
 
     if( $restricted_to && is_array( $restricted_to ) && ! $has_access ) {
 
-        foreach( $restricted_to as $item => $data ) {
+		foreach( $restricted_to as $item => $data ) {
 
-            if( empty( $data['download'] ) ) {
-                $has_access = true;
-            }
+			if( empty( $data['download'] ) ) {
+				$has_access = true;
+			}
 
-            // The author of a download always has access
-            if( (int) get_post_field( 'post_author', $data['download'] ) === (int) $user_id && is_user_logged_in() ) {
-                $has_access = true;
-                break;
-            }
+			// The author of a download always has access
+			if( (int) get_post_field( 'post_author', $data['download'] ) === (int) $user_id && is_user_logged_in() ) {
+				$has_access = true;
+				break;
+			}
 
-            // If restricted to any customer and user has purchased something
-            if( 'any' === $data['download'] && edd_has_purchases( $user_id ) && is_user_logged_in() ) {
-                $has_access  = true;
-                break;
-            } elseif( 'any' === $data['download'] ) {
-                $products[0] = __( 'any product', 'edd_cr' );
-                $has_access  = false;
-                break;
-            }
+			// If restricted to any customer and user has purchased something
+			if( 'any' === $data['download'] && edd_has_purchases( $user_id ) && is_user_logged_in() ) {
+				$has_access  = true;
+				break;
+			} elseif( 'any' === $data['download'] ) {
+				$has_access  = false;
+				break;
+			}
 
-            // Check for variable prices
-            if( ! $has_access ) {
+			// Check for variable prices
+			if( ! $has_access ) {
 
-                if( edd_has_variable_prices( $data['download'] ) ) {
+				if( edd_has_variable_prices( $data['download'] ) ) {
 
-                    if( strtolower( $data['price_id'] ) !== 'all' && ! empty( $data['price_id'] ) ) {
-                        $products[] = '<a href="' . get_permalink( $data['download'] ) . '">' . get_the_title( $data['download'] ) . ' - ' . edd_get_price_option_name( $data['download'], $data['price_id'] ) . '</a>';
+					if( strtolower( $data['price_id'] ) !== 'all' && ! empty( $data['price_id'] ) ) {
+						$products[] = '<a href="' . get_permalink( $data['download'] ) . '">' . get_the_title( $data['download'] ) . ' - ' . edd_get_price_option_name( $data['download'], $data['price_id'] ) . '</a>';
 
-                        if( edd_has_user_purchased( $user_id, $data['download'], $data['price_id'] ) ) {
-                            $has_access = true;
-                        }
+						if( edd_has_user_purchased( $user_id, $data['download'], $data['price_id'] ) ) {
+							$has_access = true;
+						}
 
-                    } else {
-                        $products[] = '<a href="' . get_permalink( $data['download'] ) . '">' . get_the_title( $data['download'] ) . '</a>';
+					} else {
+						$products[] = '<a href="' . get_permalink( $data['download'] ) . '">' . get_the_title( $data['download'] ) . '</a>';
 
-                        if( edd_has_user_purchased( $user_id, $data['download'] ) ) {
-                            $has_access = true;
-                        }
-                    }
+						if( edd_has_user_purchased( $user_id, $data['download'] ) ) {
+							$has_access = true;
+						}
+					}
 
-                } else {
+				} else {
 
-                    $products[] = '<a href="' . get_permalink( $data['download'] ) . '">' . get_the_title( $data['download'] ) . '</a>';
-                    if( is_user_logged_in() && edd_has_user_purchased( $user_id, $data['download'] ) ) {
-                        $has_access = true;
-                    }
-                }
+					$products[] = '<a href="' . get_permalink( $data['download'] ) . '">' . get_the_title( $data['download'] ) . '</a>';
+					if( is_user_logged_in() && edd_has_user_purchased( $user_id, $data['download'] ) ) {
+						$has_access = true;
+					}
+				}
 
-            }
+			}
 
-        }
+		}
 
-        if( $has_access == false ) {
+		if( $has_access == false ) {
 
-            if( $restricted_count > 1 ) {
+			if( $restricted_count > 1 ) {
+				$message = edd_cr_get_single_restriction_message();
+				$product_list = '';
 
-                $message  = __( 'This content is restricted to buyers of:', 'edd_cr' );
+				if( ! empty( $products ) ) {
 
-                if( ! empty( $products ) ) {
+					$product_list .= '<ul>';
 
-                    $message .= '<ul>';
+					foreach( $products as $id => $product ) {
+						$product_list .= '<li>' . $product . '</li>';
+					}
 
-                    foreach( $products as $id => $product ) {
-                        $message .= '<li>' . $product . '</li>';
-                    }
+					$product_list .= '</ul>';
 
-                    $message .= '</ul>';
+				}
 
-                }
+				$message = str_replace( '{product_names', $product_list, $message );
 
-            } else {
+			} else {
 
-                $message = sprintf(
-                    __( 'This content is restricted to buyers of %s.', 'edd_cr' ),
-                    $products[0]
-                );
+				if ( 'any' === $data['download'] ) {
+					$message = edd_cr_get_any_restriction_message();
+				} else {
+					$message = edd_cr_get_single_restriction_message();
+					$message = str_replace( '{product_name}', $products[0], $message );
+				}
 
-            }
+			}
 
-        }
+		}
 
-        if( isset( $message ) ) {
+		if( isset( $message ) ) {
 
-            $return['message'] = $message;
+			$return['message'] = $message;
 
-        } else {
+		} else {
 
-            $return['message'] = __( 'This content is restricted to buyers.', 'edd_cr' );
+			$return['message'] = __( 'This content is restricted to buyers.', 'edd-cr' );
 
-        }
+		}
 
-    } else {
+	} else {
 
-        // Just in case we're checking something unrestricted...
-        $has_access = true;
+		// Just in case we're checking something unrestricted...
+		$has_access = true;
 
-    }
+	}
 
-    // Allow plugins to modify the restriction requirements
-    $has_access = apply_filters( 'edd_cr_user_can_access', $has_access, $user_id, $restricted_to );
+	// Allow plugins to modify the restriction requirements
+	$has_access = apply_filters( 'edd_cr_user_can_access', $has_access, $user_id, $restricted_to );
 
-    $return['status'] = $has_access;
+	$return['status'] = $has_access;
 
-    return $return;
+	return $return;
 }
 
 
@@ -167,20 +170,20 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
  * @return      string $content The filtered content
  */
 function edd_cr_filter_content( $content ) {
-    global $post;
+	global $post;
 
-    // If $post isn't an object, we aren't handling it!
-    if( ! is_object( $post ) ) {
-        return $content;
-    }
+	// If $post isn't an object, we aren't handling it!
+	if( ! is_object( $post ) ) {
+		return $content;
+	}
 
-    $restricted = edd_cr_is_restricted( $post->ID );
+	$restricted = edd_cr_is_restricted( $post->ID );
 
-    if( $restricted ) {
-        $content = edd_cr_filter_restricted_content( $content, $restricted, null, $post->ID );
-    }
+	if( $restricted ) {
+		$content = edd_cr_filter_restricted_content( $content, $restricted, null, $post->ID );
+	}
 
-    return $content;
+	return $content;
 }
 add_filter( 'the_content', 'edd_cr_filter_content' );
 
@@ -198,24 +201,24 @@ add_filter( 'the_content', 'edd_cr_filter_content' );
  * @return      string $content The content to display to the user
  */
 function edd_cr_filter_restricted_content( $content = '', $restricted = false, $message = null, $post_id = 0, $class = '' ) {
-    global $user_ID;
+	global $user_ID;
 
-    // If the current user can edit this post, it can't be restricted!
-    if( ! current_user_can( 'edit_post', $post_id ) && $restricted ) {
+	// If the current user can edit this post, it can't be restricted!
+	if( ! current_user_can( 'edit_post', $post_id ) && $restricted ) {
 
-        $has_access = edd_cr_user_can_access( $user_ID, $restricted, $post_id );
+		$has_access = edd_cr_user_can_access( $user_ID, $restricted, $post_id );
 
-        if( $has_access['status'] == false ) {
+		if( $has_access['status'] == false ) {
 
-            if( ! empty( $message ) ) {
-                $has_access['message'] = $message;
-            }
+			if( ! empty( $message ) ) {
+				$has_access['message'] = $message;
+			}
 
-            $content = '<div class="edd_cr_message ' . $class . '">' . $has_access['message'] . '</div>';
-        }
-    }
+			$content = '<div class="edd_cr_message ' . $class . '">' . $has_access['message'] . '</div>';
+		}
+	}
 
-    return do_shortcode( $content );
+	return do_shortcode( $content );
 }
 
 
@@ -227,9 +230,9 @@ function edd_cr_filter_restricted_content( $content = '', $restricted = false, $
  * @return      bool True if post is restricted, false otherwise
  */
 function edd_cr_is_restricted( $post_id ) {
-    $restricted = get_post_meta( $post_id, '_edd_cr_restricted_to', true );
+	$restricted = get_post_meta( $post_id, '_edd_cr_restricted_to', true );
 
-    return $restricted;
+	return $restricted;
 }
 
 
@@ -242,27 +245,27 @@ function edd_cr_is_restricted( $post_id ) {
  * @return      void
  */
 function edd_cr_add_to_receipt( $payment, $edd_receipt_args ) {
-    // Get the array of restricted pages for this payment
-    $meta = edd_cr_get_restricted_pages( $payment->ID );
+	// Get the array of restricted pages for this payment
+	$meta = edd_cr_get_restricted_pages( $payment->ID );
 
-    // No pages? Quit!
-    if( empty( $meta ) ) {
-        return;
-    }
+	// No pages? Quit!
+	if( empty( $meta ) ) {
+		return;
+	}
 
-    echo '</tbody></table><h3>' . __( 'Pages', 'edd_cr' ) . '</h3><table><tbody>';
+	echo '</tbody></table><h3>' . __( 'Pages', 'edd-cr' ) . '</h3><table><tbody>';
 
-    echo '<tr><td>';
-    echo '<ul class="edd-cr-receipt">';
+	echo '<tr><td>';
+	echo '<ul class="edd-cr-receipt">';
 
-    foreach( $meta as $post ) {
-        echo '<li>';
-        echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '" class="edd_download_file_link">' . $post->post_title . '</a>';
-        echo '</li>';
-    }
+	foreach( $meta as $post ) {
+		echo '<li>';
+		echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '" class="edd_download_file_link">' . $post->post_title . '</a>';
+		echo '</li>';
+	}
 
-    echo '</ul>';
-    echo '</td></tr>';
+	echo '</ul>';
+	echo '</td></tr>';
 }
 add_action( 'edd_payment_receipt_after', 'edd_cr_add_to_receipt', 1, 2 );
 
@@ -274,7 +277,7 @@ add_action( 'edd_payment_receipt_after', 'edd_cr_add_to_receipt', 1, 2 );
  * @return      void
  */
 function edd_cr_register_email_tags() {
-    edd_add_email_tag( 'page_list', __( 'Shows a list of restricted pages the customer has access to', 'edd_cr' ), 'edd_cr_add_template_tags' );
+	edd_add_email_tag( 'page_list', __( 'Shows a list of restricted pages the customer has access to', 'edd-cr' ), 'edd_cr_add_template_tags' );
 }
 add_action( 'edd_add_email_tags', 'edd_cr_register_email_tags' );
 
@@ -287,25 +290,25 @@ add_action( 'edd_add_email_tags', 'edd_cr_register_email_tags' );
  * @return      string $page_list The list of accessible pages
  */
 function edd_cr_add_template_tags( $payment_id ) {
-    // Get the array of restricted pages for this payment
-    $meta = edd_cr_get_restricted_pages( $payment_id );
+	// Get the array of restricted pages for this payment
+	$meta = edd_cr_get_restricted_pages( $payment_id );
 
-    // No pages? Quit!
-    if( empty( $meta ) ) {
-        return '';
-    }
+	// No pages? Quit!
+	if( empty( $meta ) ) {
+		return '';
+	}
 
-    $page_list = '<div class="edd_cr_accessible_pages">' . __( 'Pages', 'edd_cr' ) . '</div>';
-    $page_list .= '<ul>';
+	$page_list = '<div class="edd_cr_accessible_pages">' . __( 'Pages', 'edd-cr' ) . '</div>';
+	$page_list .= '<ul>';
 
-    foreach( $meta as $post ) {
-        $page_list .= '<li><a href="' . esc_url( get_permalink( $post->ID ) ) . '">' . $post->post_title . '</a></li>';
-    }
+	foreach( $meta as $post ) {
+		$page_list .= '<li><a href="' . esc_url( get_permalink( $post->ID ) ) . '">' . $post->post_title . '</a></li>';
+	}
 
-    $page_list .= '</ul>';
-    $page_list .= '</li>';
+	$page_list .= '</ul>';
+	$page_list .= '</li>';
 
-    return $page_list;
+	return $page_list;
 }
 
 
@@ -318,39 +321,87 @@ function edd_cr_add_template_tags( $payment_id ) {
  */
 function edd_cr_get_restricted_pages( $payment_id = 0 ) {
 
-    if( empty( $payment_id ) ) {
-        return false;
-    }
+	if( empty( $payment_id ) ) {
+		return false;
+	}
 
-    $posts    = array();
-    $post_ids = array();
-    $files    = edd_get_payment_meta_downloads( $payment_id );
-    $ids      = array_unique( wp_list_pluck( $files, 'id' ) );
+	$posts    = array();
+	$post_ids = array();
+	$files    = edd_get_payment_meta_downloads( $payment_id );
 
-    foreach( $ids as $download_id ) {
+	if ( ! empty( $files ) && is_array( $files ) ) {
+		$ids = array_unique( wp_list_pluck( $files, 'id' ) );
 
-        $meta = get_post_meta( $download_id, '_edd_cr_protected_post' );
-        if( $meta ) {
-            $post_ids = array_merge( $post_ids, $meta );
-        }
+		foreach( $ids as $download_id ) {
 
-    }
+			$meta = get_post_meta( $download_id, '_edd_cr_protected_post' );
+			if( $meta ) {
+				$post_ids = array_merge( $post_ids, $meta );
+			}
 
-    $post_ids = array_unique( array_map( 'absint', $post_ids ) );
+		}
+	}
 
-    if( ! empty( $post_ids ) ) {
+	$post_ids = array_unique( array_map( 'absint', $post_ids ) );
 
-        $args = array(
-            'post_type' => 'any',
-            'nopaging'  => true,
-            'post__in'  => $post_ids
-        );
+	if( ! empty( $post_ids ) ) {
 
-        $query = new WP_Query( $args );
+		$args = array(
+			'post_type' => 'any',
+			'nopaging'  => true,
+			'post__in'  => $post_ids
+		);
 
-        $posts = $query->posts;
+		$query = new WP_Query( $args );
 
-    }
+		$posts = $query->posts;
 
-    return $posts;
+	}
+
+	return $posts;
+}
+
+/**
+ * Get the message to display to people who have not purchased the necessary product to view the content
+ *
+ * @since  2.1
+ * @return string The message for non-purchases of a product
+ */
+function edd_cr_get_single_restriction_message() {
+	$default_message = sprintf( __( 'This content is restricted to buyers of %s.', 'edd-cr' ), '{product_name}' );
+	$saved_message   = edd_get_option( 'edd_cr_single_resriction_message', false );
+
+	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
+
+	return wpautop( $message );
+}
+
+/**
+ * Get the message to display to people who have not purchased the necessary product(s) to view the content
+ *
+ * @since  2.1
+ * @return string The message for non-purchases of the products
+ */
+function edd_cr_get_multi_restriction_message() {
+	$default_message = sprintf( __( 'This content is restricted to buyers of:' . "\n\n" . '%s', 'edd-cr' ), '{product_names}' );
+	$saved_message   = edd_get_option( 'edd_cr_multi_resriction_message', false );
+
+	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
+
+	return wpautop( $message );
+}
+
+/**
+ * Get the message to display to people who have not purchased any products
+ *
+ * @since  2.1
+ * @return string The message for non-purchases
+ */
+function edd_cr_get_any_restriction_message() {
+	$default_message = __( 'If you want to view this content, you need to buy any product.' );
+	$saved_message   = edd_get_option( 'edd_cr_any_resriction_message', false );
+
+	$message         = ! empty( $saved_message ) ? $saved_message : $default_message;
+
+	return wpautop( $message );
 }

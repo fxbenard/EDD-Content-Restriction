@@ -70,7 +70,7 @@ function eddcr_upgrade_post_meta() {
 		// items found so upgrade them
 
 		foreach( $items as $post_id ) {
-			
+
 			$restricted_to = get_post_meta( $post_id, '_edd_cr_restricted_to', true );
 			$price_id      = get_post_meta( $post_id, '_edd_cr_restricted_to_variable', true );
 
@@ -94,13 +94,14 @@ function eddcr_upgrade_post_meta() {
 			'step'        => $step
 		), admin_url( 'index.php' ) );
 
-		wp_redirect( $redirect ); exit;
+		wp_safe_redirect( $redirect ); exit;
 
 	} else {
 
 		// No more items found, finish up
 
 		update_option( 'eddcr_version', EDD_CONTENT_RESTRICTION_VER );
+		delete_option( 'edd_doing_upgrade' );
 
 		wp_redirect( admin_url() ); exit;
 	}

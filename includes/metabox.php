@@ -20,21 +20,21 @@ if( ! defined( 'ABSPATH' ) ) exit;
  * @return      void
  */
 function edd_cr_add_meta_box() {
-    global $post;
+	global $post;
 
-    $post_types     = get_post_types( array( 'show_ui' => true ) );
-    $excluded_types = array( 'download', 'edd_payment', 'reply', 'acf', 'deprecated_log' );
+	$post_types     = get_post_types( array( 'show_ui' => true ) );
+	$excluded_types = array( 'download', 'edd_payment', 'reply', 'acf', 'deprecated_log' );
 
-    if( ! in_array( get_post_type( $post->ID ), apply_filters( 'edd_cr_excluded_post_types', $excluded_types ) ) ) {
-        add_meta_box(
-            'content-restriction',
-            __( 'Content Restriction', 'edd_cr' ),
-            'edd_cr_render_meta_box',
-            '',
-            'normal',
-            'default'
-        );
-    }
+	if( ! in_array( get_post_type( $post->ID ), apply_filters( 'edd_cr_excluded_post_types', $excluded_types ) ) ) {
+		add_meta_box(
+			'content-restriction',
+			__( 'Content Restriction', 'edd-cr' ),
+			'edd_cr_render_meta_box',
+			'',
+			'normal',
+			'default'
+		);
+	}
 }
 add_action( 'add_meta_boxes', 'edd_cr_add_meta_box' );
 
@@ -47,46 +47,46 @@ add_action( 'add_meta_boxes', 'edd_cr_add_meta_box' );
  * @return      void
  */
 function edd_cr_render_meta_box( $post_id ) {
-    global $post;
+	global $post;
 
-    $downloads              = get_posts( array( 'post_type' => 'download', 'posts_per_page' => -1 ) );
-    $restricted_to          = get_post_meta( $post->ID, '_edd_cr_restricted_to', true );
+	$downloads              = get_posts( array( 'post_type' => 'download', 'posts_per_page' => -1 ) );
+	$restricted_to          = get_post_meta( $post->ID, '_edd_cr_restricted_to', true );
 
-    if ( $downloads ) {
-        ?>
-        <div id="edd-cr-options" class="edd_meta_table_wrap">
-            <p><strong><?php echo sprintf( __( 'Restrict this content to buyers of one or more %s.', 'edd_cr' ), strtolower( edd_get_label_plural() ) ); ?></strong></p>
-            <table class="widefat edd_repeatable_table" width="100%" cellpadding="0" cellspacing="0">
-                <thead>
-                    <th><?php echo edd_get_label_singular(); ?></th>
-                    <th><?php echo sprintf( __( '%s Variation', 'edd_cr' ), edd_get_label_singular() ); ?></th>
-                    <?php do_action( 'edd_cr_table_head', $post_id ); ?>
-                    <th style="width: 2%"></th>
-                </thead>
-                <tbody>
-                    <?php
-                        if( ! empty( $restricted_to ) && is_array( $restricted_to ) ) {
-                            foreach( $restricted_to as $key => $value ) {
-                                echo '<tr class="edd-cr-option-wrapper edd_repeatable_row">';
-                                do_action( 'edd_cr_render_option_row', $key, $post_id );
-                                echo '</tr>';
-                            }
-                        } else {
-                            echo '<tr class="edd-cr-option-wrapper edd_repeatable_row">';
-                            do_action( 'edd_cr_render_option_row', 0, $post_id );
-                            echo '</tr>';
-                        }
-                    ?>
-                    <tr>
-                        <td class="submit" colspan="4" style="float: none; clear:both; background:#fff;">
-                            <a class="button-secondary edd_add_repeatable" style="margin: 6px 0;"><?php _e( 'Add New Download', 'edd_cr' ); ?></a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <?php
-    }
+	if ( $downloads ) {
+		?>
+		<div id="edd-cr-options" class="edd_meta_table_wrap">
+			<p><strong><?php echo sprintf( __( 'Restrict this content to buyers of one or more %s.', 'edd-cr' ), strtolower( edd_get_label_plural() ) ); ?></strong></p>
+			<table class="widefat edd_repeatable_table" width="100%" cellpadding="0" cellspacing="0">
+				<thead>
+					<th><?php echo edd_get_label_singular(); ?></th>
+					<th><?php echo sprintf( __( '%s Variation', 'edd-cr' ), edd_get_label_singular() ); ?></th>
+					<?php do_action( 'edd_cr_table_head', $post_id ); ?>
+					<th style="width: 2%"></th>
+				</thead>
+				<tbody>
+					<?php
+						if( ! empty( $restricted_to ) && is_array( $restricted_to ) ) {
+							foreach( $restricted_to as $key => $value ) {
+								echo '<tr class="edd-cr-option-wrapper edd_repeatable_row" data-key="' . absint( $key ) . '">';
+								do_action( 'edd_cr_render_option_row', $key, $post_id );
+								echo '</tr>';
+							}
+						} else {
+							echo '<tr class="edd-cr-option-wrapper edd_repeatable_row">';
+							do_action( 'edd_cr_render_option_row', 0, $post_id );
+							echo '</tr>';
+						}
+					?>
+					<tr>
+						<td class="submit" colspan="4" style="float: none; clear:both; background:#fff;">
+							<a class="button-secondary edd_add_repeatable" style="margin: 6px 0;"><?php _e( 'Add New Download', 'edd-cr' ); ?></a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<?php
+	}
 }
 
 
@@ -100,45 +100,46 @@ function edd_cr_render_meta_box( $post_id ) {
  * @param       object $post The post we are editing
  */
 function edd_cr_render_option_row( $key, $post ) {
-    $downloads      = get_posts( array( 'post_type' => 'download', 'posts_per_page' => -1 ) );
-    $restricted_to  = get_post_meta( $post->ID, '_edd_cr_restricted_to', true );
-    $download_id    = isset( $restricted_to[$key]['download'] ) ? $restricted_to[$key]['download'] : 0;
-    ?>
-    <td>
-        <select name="edd_cr_download[<?php echo $key; ?>][download]" id="edd_cr_download[<?php echo $key; ?>][download]" class="edd_cr_download" data-key="<?php echo esc_attr( $key ); ?>">
-            <option value=""><?php echo __( 'None', 'edd_cr' ); ?></option>
-            <option value="any"<?php selected( 'any', $download_id ); ?>><?php echo sprintf( __( 'Customers who have purchased any %s', 'edd_cr' ), edd_get_label_singular() ); ?></option>
-            <?php
-                foreach ( $downloads as $download ) {
-                    echo '<option value="' . absint( $download->ID ) . '" ' . selected( $download_id, $download->ID, false ) . '>' . esc_html( get_the_title( $download->ID ) ) . '</option>';
-                }
-            ?>
-        </select>
-    </td>
-    <td>
-        <?php
-            if( isset( $restricted_to[$key]['price_id'] ) ) {
-                $prices = get_post_meta( $restricted_to[$key]['download'], 'edd_variable_prices', true );
-                echo '<select class="edd_price_options_select edd-select edd-select edd_cr_download" name="edd_cr_download[' . $key . '][price_id]">';
-                    echo '<option value="all" ' . selected( 'all', $restricted_to[$key]['price_id'], false ) . '>' . __( 'All prices', 'edd_cr' ) . '</option>';
-                    foreach ( $prices as $id => $data ) {
-                        echo '<option value="' . absint( $id ) . '" ' . selected( $id, $restricted_to[$key]['price_id'], false ) . '>' . esc_html( $data['name'] )  . '</option>';
-                    }
-                echo '</select>';
-                echo '<p class="edd_cr_variable_none" style="display: none;">' . __( 'None', 'edd_cr' ) . '</p>';
-            } else {
-                echo '<p class="edd_cr_variable_none">' . __( 'None', 'edd_cr' ) . '</p>';
-            }
-        ?>
-        <img src="<?php echo admin_url( '/images/wpspin_light.gif' ); ?>" class="waiting edd_cr_loading" style="display:none;"/>
-    </td>
-    <td>
-        <a href="#" class="edd_remove_repeatable" data-type="price" style="background: url(<?php echo admin_url('/images/xit.gif'); ?>) no-repeat;">&times;</a>
-    </td>
-    <?php
+	$downloads      = get_posts( array( 'post_type' => 'download', 'posts_per_page' => -1 ) );
+	$restricted_to  = get_post_meta( $post->ID, '_edd_cr_restricted_to', true );
+	$download_id    = isset( $restricted_to[$key]['download'] ) ? $restricted_to[$key]['download'] : 0;
+	?>
+	<td>
+		<select name="edd_cr_download[<?php echo $key; ?>][download]" id="edd_cr_download[<?php echo $key; ?>][download]" class="edd_cr_download" data-key="<?php echo esc_attr( $key ); ?>">
+			<option value=""><?php echo __( 'None', 'edd-cr' ); ?></option>
+			<option value="any"<?php selected( 'any', $download_id ); ?>><?php echo sprintf( __( 'Customers who have purchased any %s', 'edd-cr' ), edd_get_label_singular() ); ?></option>
+			<?php
+				foreach ( $downloads as $download ) {
+					echo '<option value="' . absint( $download->ID ) . '" ' . selected( $download_id, $download->ID, false ) . '>' . esc_html( get_the_title( $download->ID ) ) . '</option>';
+				}
+			?>
+		</select>
+	</td>
+	<td>
+		<?php
+			if( isset( $restricted_to[$key]['price_id'] ) && edd_has_variable_prices( $restricted_to[$key]['download'] ) ) {
 
-    do_action( 'edd_cr_metabox', $post->ID, $restricted_to, null );
-    echo wp_nonce_field( 'edd-cr-nonce', 'edd-cr-nonce' );
+				$prices = edd_get_variable_prices( $restricted_to[$key]['download'] );
+				echo '<select class="edd_price_options_select edd-select edd-select edd_cr_download" name="edd_cr_download[' . $key . '][price_id]">';
+					echo '<option value="all" ' . selected( 'all', $restricted_to[$key]['price_id'], false ) . '>' . __( 'All prices', 'edd-cr' ) . '</option>';
+					foreach ( $prices as $id => $data ) {
+						echo '<option value="' . absint( $id ) . '" ' . selected( $id, $restricted_to[$key]['price_id'], false ) . '>' . esc_html( $data['name'] )  . '</option>';
+					}
+				echo '</select>';
+				echo '<p class="edd_cr_variable_none" style="display: none;">' . __( 'None', 'edd-cr' ) . '</p>';
+			} else {
+				echo '<p class="edd_cr_variable_none">' . __( 'None', 'edd-cr' ) . '</p>';
+			}
+		?>
+		<img src="<?php echo admin_url( '/images/wpspin_light.gif' ); ?>" class="waiting edd_cr_loading" style="display:none;"/>
+	</td>
+	<td>
+		<a href="#" class="edd_remove_repeatable" data-type="price" style="background: url(<?php echo admin_url('/images/xit.gif'); ?>) no-repeat;">&times;</a>
+	</td>
+	<?php
+
+	do_action( 'edd_cr_metabox', $post->ID, $restricted_to, null );
+	echo wp_nonce_field( 'edd-cr-nonce', 'edd-cr-nonce' );
 }
 add_action( 'edd_cr_render_option_row', 'edd_cr_render_option_row', 10, 3 );
 
@@ -152,78 +153,78 @@ add_action( 'edd_cr_render_option_row', 'edd_cr_render_option_row', 10, 3 );
  */
 function edd_cr_save_meta_data( $post_id ) {
 
-    if( ! isset( $_POST['edd_cr_download'] ) || ! is_array( $_POST['edd_cr_download'] ) ) {
+	if( ! isset( $_POST['edd_cr_download'] ) || ! is_array( $_POST['edd_cr_download'] ) ) {
 
-        return;
+		return;
 
-    }
+	}
 
-    if( ! isset( $_POST['edd-cr-nonce'] ) || ! wp_verify_nonce( $_POST['edd-cr-nonce'], 'edd-cr-nonce' ) ) {
+	if( ! isset( $_POST['edd-cr-nonce'] ) || ! wp_verify_nonce( $_POST['edd-cr-nonce'], 'edd-cr-nonce' ) ) {
 
-        return;
+		return;
 
-    }
+	}
 
-    if( ! empty( $_POST['edd_cr_download'] ) ) {
+	if( ! empty( $_POST['edd_cr_download'] ) ) {
 
-        // Grab the items this post was previously restricted to and remove related meta
-        $previous_items = get_post_meta( $post_id, '_edd_cr_restricted_to', true );
+		// Grab the items this post was previously restricted to and remove related meta
+		$previous_items = get_post_meta( $post_id, '_edd_cr_restricted_to', true );
 
-        if( $previous_items ) {
+		if( $previous_items ) {
 
-            foreach( $previous_items as $item ) {
+			foreach( $previous_items as $item ) {
 
-                 if( 'any' !== $item['download'] ) {
+				 if( 'any' !== $item['download'] ) {
 
-                    delete_post_meta( $item['download'], '_edd_cr_protected_post', $post_id );
+					delete_post_meta( $item['download'], '_edd_cr_protected_post', $post_id );
 
-                 }
+				 }
 
-            }
+			}
 
-        }
+		}
 
-        $has_items = false;
+		$has_items = false;
 
-        foreach( $_POST['edd_cr_download'] as $item ) {
+		foreach( $_POST['edd_cr_download'] as $item ) {
 
-            if( 'any' !== $item['download'] && ! empty( $item['download'] ) ) {
+			if( 'any' !== $item['download'] && ! empty( $item['download'] ) ) {
 
-                $saved_ids = get_post_meta( $item['download'], '_edd_cr_protected_post' );
+				$saved_ids = get_post_meta( $item['download'], '_edd_cr_protected_post' );
 
-                if( ! in_array( $post_id, $saved_ids ) ) {
+				if( ! in_array( $post_id, $saved_ids ) ) {
 
-                    add_post_meta( $item['download'], '_edd_cr_protected_post', $post_id );
+					add_post_meta( $item['download'], '_edd_cr_protected_post', $post_id );
 
-                }
+				}
 
-                $has_items = true;
+				$has_items = true;
 
-            } else if( 'any' == $item['download'] ) {
+			} else if( 'any' == $item['download'] ) {
 
-                $has_items = true;
+				$has_items = true;
 
-            }
+			}
 
-        }
+		}
 
-        if( $has_items ) {
+		if( $has_items ) {
 
-            update_post_meta( $post_id, '_edd_cr_restricted_to', $_POST['edd_cr_download'] );
+			update_post_meta( $post_id, '_edd_cr_restricted_to', $_POST['edd_cr_download'] );
 
-        } else {
+		} else {
 
-            delete_post_meta( $post_id, '_edd_cr_restricted_to' );
+			delete_post_meta( $post_id, '_edd_cr_restricted_to' );
 
-        }
+		}
 
-    } else {
+	} else {
 
-        delete_post_meta( $post_id, '_edd_cr_restricted_to' );
+		delete_post_meta( $post_id, '_edd_cr_restricted_to' );
 
-    }
+	}
 
-    do_action( 'edd_cr_save_meta_data', $post_id, $_POST );
+	do_action( 'edd_cr_save_meta_data', $post_id, $_POST );
 
 }
 add_action( 'save_post', 'edd_cr_save_meta_data' );

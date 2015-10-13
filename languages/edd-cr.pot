@@ -1,0 +1,191 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Easy Digital Downloads - Content Restriction\n"
+"POT-Creation-Date: 2015-10-02 18:56-0400\n"
+"PO-Revision-Date: 2015-10-02 18:56-0400\n"
+"Last-Translator: John Parris <public@johnparris.com>\n"
+"Language-Team: John Parris <public@johnparris.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.5\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: edd-content-restriction.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: edd-content-restriction.php:170
+msgid "Content Restriction Settings"
+msgstr ""
+
+#: edd-content-restriction.php:171
+msgid "Configure Content Restriction Settings"
+msgstr ""
+
+#: edd-content-restriction.php:176
+msgid "Hide Menu Items"
+msgstr ""
+
+#: edd-content-restriction.php:177
+msgid "Should we hide menu items a user doesn't have access to?"
+msgstr ""
+
+#: edd-content-restriction.php:182
+msgid "Single Restriction Message"
+msgstr ""
+
+#: edd-content-restriction.php:183
+msgid ""
+"When access is restricted by a single product, this message will show to the "
+"user when they do not have access. <code>{product_name}</code> will be "
+"replaced by the restriction requirements."
+msgstr ""
+
+#: edd-content-restriction.php:191
+msgid "Multiple Restriction Message"
+msgstr ""
+
+#: edd-content-restriction.php:192
+msgid ""
+"When access is restricted by multiple products, this message will show to "
+"the user when they do not have access. <code>{product_names}</code> will be "
+"replaced by a list of the restriction requirements."
+msgstr ""
+
+#: edd-content-restriction.php:200
+msgid "Restriction for \"Any Product\""
+msgstr ""
+
+#: edd-content-restriction.php:201
+msgid ""
+"When access to content is restricted to anyone who has made a purchase, this "
+"is the message displayed to people without a purchase."
+msgstr ""
+
+#: includes/ajax-functions.php:38 includes/metabox.php:124
+msgid "All prices"
+msgstr ""
+
+#: includes/class.extension-activation.php:47
+msgid "This plugin"
+msgstr ""
+
+#: includes/class.extension-activation.php:82
+msgid " requires Easy Digital Downloads! Please activate it to continue!"
+msgstr ""
+
+#: includes/class.extension-activation.php:84
+msgid " requires Easy Digital Downloads! Please install it to continue!"
+msgstr ""
+
+#: includes/functions.php:144
+msgid "This content is restricted to buyers."
+msgstr ""
+
+#: includes/functions.php:256 includes/functions.php:301
+msgid "Pages"
+msgstr ""
+
+#: includes/functions.php:280
+msgid "Shows a list of restricted pages the customer has access to"
+msgstr ""
+
+#: includes/functions.php:371
+#, php-format
+msgid "This content is restricted to buyers of %s."
+msgstr ""
+
+#: includes/functions.php:386
+#, php-format
+msgid ""
+"This content is restricted to buyers of:\n"
+"\n"
+"%s"
+msgstr ""
+
+#: includes/functions.php:401
+msgid "If you want to view this content, you need to buy any product."
+msgstr ""
+
+#: includes/metabox.php:31
+msgid "Content Restriction"
+msgstr ""
+
+#: includes/metabox.php:58
+#, php-format
+msgid "Restrict this content to buyers of one or more %s."
+msgstr ""
+
+#: includes/metabox.php:62
+#, php-format
+msgid "%s Variation"
+msgstr ""
+
+#: includes/metabox.php:82
+msgid "Add New Download"
+msgstr ""
+
+#: includes/metabox.php:109 includes/metabox.php:129 includes/metabox.php:131
+msgid "None"
+msgstr ""
+
+#: includes/metabox.php:110
+#, php-format
+msgid "Customers who have purchased any %s"
+msgstr ""
+
+#: includes/modules/bbpress.php:298
+msgid "Topic creation is restricted to buyers."
+msgstr ""
+
+#: includes/modules/bbpress.php:318
+msgid "This forum is restricted to buyers."
+msgstr ""
+
+#: includes/modules/bbpress.php:322
+msgid "Only buyers can create topics."
+msgstr ""
+
+#: includes/shortcodes.php:92 includes/shortcodes.php:95
+msgid "You have not purchased access to any content."
+msgstr ""
+
+#: includes/shortcodes.php:98
+msgid "You must be logged in to access your purchased content."
+msgstr ""
+
+#: includes/upgrades.php:25
+#, php-format
+msgid ""
+"Easy Digital Downloads needs to upgrade the Content Restriction settings, "
+"click %shere%s to start the upgrade."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Easy Digital Downloads - Content Restriction"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://easydigitaldownloads.com/extension/content-restriction/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Allows you to restrict content from posts, pages, and custom post types to "
+"only those users who have purchased certain products. Also includes bbPress "
+"support."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Pippin Williamson and Daniel J Griffiths"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://easydigitaldownloads.com"
+msgstr ""
