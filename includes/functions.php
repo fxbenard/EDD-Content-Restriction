@@ -105,7 +105,8 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 		if( $has_access == false ) {
 
 			if( $restricted_count > 1 ) {
-				$message = edd_cr_get_single_restriction_message();
+				$message = edd_cr_get_multi_restriction_message();
+
 				$product_list = '';
 
 				if( ! empty( $products ) ) {
@@ -120,7 +121,7 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 
 				}
 
-				$message = str_replace( '{product_names', $product_list, $message );
+				$message = str_replace( '{product_names}', $product_list, $message );
 
 			} else {
 
