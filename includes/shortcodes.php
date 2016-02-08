@@ -26,14 +26,14 @@ function edd_cr_restrict_shortcode( $atts, $content = null ) {
 		'price_id'  => null,
 		'message'   => null,
 		'class'     => ''
-	), $atts );
+	), $atts, 'edd_restrict' );
 
+	$restricted_to = array();
 
 	if( ! is_null( $atts['id'] ) ) {
 
 		$ids = explode( ',', $atts['id'] );
 
-		$restricted_to = array();
 		foreach( $ids as $download_id ) {
 
 			$restricted_to[] = array(
@@ -46,7 +46,8 @@ function edd_cr_restrict_shortcode( $atts, $content = null ) {
 		$content = edd_cr_filter_restricted_content( $content, $restricted_to, $atts['message'], 0, $atts['class'] );
 	}
 
-	return $content;
+	// Allows extensions to filter on the content, restrictions, and attributes passed
+	return apply_filters( 'edd_cr_restrict_shortcode_content', $content, $restricted_to, $atts );
 }
 add_shortcode( 'edd_restrict', 'edd_cr_restrict_shortcode' );
 
@@ -62,7 +63,7 @@ add_shortcode( 'edd_restrict', 'edd_cr_restrict_shortcode' );
 function edd_cr_pages_shortcode( $atts, $content = null ) {
 	$atts = shortcode_atts( array(
 		'class'     => ''
-	), $atts );
+	), $atts, 'edd_restricted_pages' );
 
 	if( is_user_logged_in() ) {
 		$pages     = array();
