@@ -45,7 +45,8 @@ function edd_cr_restrict_shortcode( $atts, $content = null ) {
 		$content = edd_cr_filter_restricted_content( $content, $restricted_to, $atts['message'], 0, $atts['class'] );
 	}
 
-	return $content;
+	// Allows extensions to filter on the content, restrictions, and attributes passed
+	return apply_filters( 'edd_cr_restrict_shortcode_content', $content, $restricted_to, $atts );
 }
 add_shortcode( 'edd_restrict', 'edd_cr_restrict_shortcode' );
 
