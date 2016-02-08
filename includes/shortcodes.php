@@ -28,11 +28,12 @@ function edd_cr_restrict_shortcode( $atts, $content = null ) {
 		'class'     => ''
 	), $atts, 'edd_restrict' );
 
+	$restricted_to = array();
+
 	if( ! is_null( $atts['id'] ) ) {
 
 		$ids = explode( ',', $atts['id'] );
 
-		$restricted_to = array();
 		foreach( $ids as $download_id ) {
 
 			$restricted_to[] = array(
