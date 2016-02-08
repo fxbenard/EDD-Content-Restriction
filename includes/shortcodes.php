@@ -26,8 +26,7 @@ function edd_cr_restrict_shortcode( $atts, $content = null ) {
 		'price_id'  => null,
 		'message'   => null,
 		'class'     => ''
-	), $atts );
-
+	), $atts, 'edd_restrict' );
 
 	if( ! is_null( $atts['id'] ) ) {
 
@@ -62,7 +61,7 @@ add_shortcode( 'edd_restrict', 'edd_cr_restrict_shortcode' );
 function edd_cr_pages_shortcode( $atts, $content = null ) {
 	$atts = shortcode_atts( array(
 		'class'     => ''
-	), $atts );
+	), $atts, 'edd_restricted_pages' );
 
 	if( is_user_logged_in() ) {
 		$pages     = array();
