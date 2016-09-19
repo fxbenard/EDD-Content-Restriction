@@ -24,10 +24,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 function edd_cr_add_meta_box() {
 	global $post;
 
-	$post_types     = get_post_types( array( 'show_ui' => true ) );
-	$excluded_types = array( 'download', 'edd_payment', 'reply', 'acf', 'deprecated_log', 'edd-checkout-fields', 'fes-forms' );
+	$included_types = apply_filters( 'edd_cr_included_post_types', get_post_types( array( 'show_ui' => true, 'public' => true ) ) );
+	$excluded_types = apply_filters( 'edd_cr_excluded_post_types', array( 'download', 'edd_payment', 'reply', 'acf', 'deprecated_log', 'edd-checkout-fields', 'fes-forms' ) );
+	$post_type      = get_post_type( $post->ID );
 
-	if ( ! in_array( get_post_type( $post->ID ), apply_filters( 'edd_cr_excluded_post_types', $excluded_types ) ) ) {
+	if ( in_array( $post_type, $included_types ) && ! in_array( $post_type, $excluded_types ) ) {
 		add_meta_box(
 			'content-restriction',
 			__( 'Content Restriction', 'edd-cr' ),
