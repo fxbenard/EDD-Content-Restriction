@@ -123,19 +123,34 @@ function edd_cr_add_to_receipt( $payment, $edd_receipt_args ) {
 	if ( empty( $meta ) ) {
 		return;
 	}
+	?>
 
-	echo '</tbody></table><h3>' . __( 'Pages', 'edd-cr' ) . '</h3><table><tbody>';
+	<h3><?php echo apply_filters( 'edd_cr_payment_receipt_pages_title', __( 'Pages', 'edd-cr' ) ); ?></h3>
 
-	echo '<tr><td>';
-	echo '<ul class="edd-cr-receipt">';
-
-	foreach ( $meta as $post ) {
-		echo '<li>';
-		echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '" class="edd_download_file_link">' . $post->post_title . '</a>';
-		echo '</li>';
-	}
-
-	echo '</ul>';
-	echo '</td></tr>';
+	<table id="edd_purchase_receipt_pages" class="edd-table">
+		<thead>
+			<tr>
+				<th><?php _e( 'Product', 'edd-cr' ); ?></th>
+				<th><?php _e( 'Pages', 'edd-cr' ); ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php foreach ( $meta as $download_id => $pages ) : ?>
+				<tr>
+					<td class="edd_purchase_receipt_pages_download">
+						<?php echo get_the_title( $download_id ); ?>
+					</td>
+					<td class="edd_purchase_receipt_pages">
+						<ul>
+							<?php foreach ( $pages as $page_id => $page_title ) : ?>
+								<li><a href="<?php echo esc_url( get_permalink( $page_id ) ); ?>"><?php echo $page_title; ?></a></li>
+							<?php endforeach; ?>
+						</ul>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	<?php
 }
-add_action( 'edd_payment_receipt_after', 'edd_cr_add_to_receipt', 1, 2 );
+add_action( 'edd_payment_receipt_after_table', 'edd_cr_add_to_receipt', 1, 2 );
