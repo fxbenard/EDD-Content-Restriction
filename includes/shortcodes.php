@@ -9,7 +9,9 @@
 
 
 // Exit if accessed directly
-if( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 
 /**
@@ -30,17 +32,14 @@ function edd_cr_restrict_shortcode( $atts, $content = null ) {
 
 	$restricted_to = array();
 
-	if( ! is_null( $atts['id'] ) ) {
-
+	if ( ! is_null( $atts['id'] ) ) {
 		$ids = explode( ',', $atts['id'] );
 
-		foreach( $ids as $download_id ) {
-
+		foreach ( $ids as $download_id ) {
 			$restricted_to[] = array(
 				'download' => $download_id,
 				'price_id' => $atts['price_id']
 			);
-
 		}
 
 		$content = edd_cr_filter_restricted_content( $content, $restricted_to, $atts['message'], 0, $atts['class'] );
@@ -62,18 +61,18 @@ add_shortcode( 'edd_restrict', 'edd_cr_restrict_shortcode' );
  */
 function edd_cr_pages_shortcode( $atts, $content = null ) {
 	$atts = shortcode_atts( array(
-		'class'     => ''
+		'class' => ''
 	), $atts, 'edd_restricted_pages' );
 
-	if( is_user_logged_in() ) {
+	if ( is_user_logged_in() ) {
 		$pages     = array();
 		$purchases = edd_get_users_purchases( get_current_user_id(), -1 );
 
-		if( $purchases ) {
-			foreach( $purchases as $purchase ) {
+		if ( $purchases ) {
+			foreach ( $purchases as $purchase ) {
 				$restricted = edd_cr_get_restricted_pages( $purchase->ID );
 
-				if( empty( $restricted ) ) {
+				if ( empty( $restricted ) ) {
 					continue;
 				}
 
@@ -81,10 +80,10 @@ function edd_cr_pages_shortcode( $atts, $content = null ) {
 				$pages    = array_unique( array_merge( $page_ids, $pages ) );
 			}
 
-			if( ! empty( $pages ) ) {
+			if ( ! empty( $pages ) ) {
 				$content = '<ul class="edd_cr_pages">';
 
-				foreach( $pages as $page_id ) {
+				foreach ( $pages as $page_id ) {
 					$content .= '<li><a href="' . esc_url( get_permalink( $page_id ) ) . '">' . get_the_title( $page_id ) . '</a></li>';
 				}
 

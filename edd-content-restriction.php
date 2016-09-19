@@ -13,7 +13,9 @@
 
 
 // Exit if accessed directly
-if( ! defined( 'ABSPATH' ) ) exit;
+if( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 
 if( ! class_exists( 'EDD_Content_Restriction' ) ) {
@@ -81,19 +83,20 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 		 * @return      void
 		 */
 		public function includes() {
-
 			if( is_admin() ) {
-
-				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/upgrades.php';
-
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/admin/metabox.php';
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/admin/settings/register.php';
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/admin/upgrades.php';
 			}
 
-			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/functions.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/misc-functions.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/user-functions.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/template-functions.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/ajax-functions.php';
-			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/metabox.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/scripts.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/filters.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/shortcodes.php';
-			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/template-tags.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/email-tags.php';
 
 			// Check for bbPress
 			if ( class_exists( 'bbPress' ) ) {
@@ -149,66 +152,6 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 			if ( class_exists( 'EDD_License' ) ) {
 				$license = new EDD_License( __FILE__, 'Content Restriction', EDD_CONTENT_RESTRICTION_VER, 'Pippin Williamson' );
 			}
-
-			// Register settings
-			add_filter( 'edd_settings_extensions', array( $this, 'settings' ), 1 );
-		}
-
-
-		/**
-		 * Add settings
-		 *
-		 * @access      public
-		 * @since       1.0.0
-		 * @param       array $settings The existing EDD settings array
-		 * @return      array The modified EDD settings array
-		 */
-		public function settings( $settings ) {
-			$new_settings = array(
-				array(
-					'id'    => 'edd_content_restriction_settings',
-					'name'  => '<strong>' . __( 'Content Restriction Settings', 'edd-cr' ) . '</strong>',
-					'desc'  => __( 'Configure Content Restriction Settings', 'edd-cr' ),
-					'type'  => 'header',
-				),
-				array(
-					'id'    => 'edd_content_restriction_hide_menu_items',
-					'name'  => __( 'Hide Menu Items', 'edd-cr' ),
-					'desc'  => __( 'Should we hide menu items a user doesn\'t have access to?', 'edd-cr' ),
-					'type'  => 'checkbox',
-				),
-				array(
-					'id'          => 'edd_cr_single_resriction_message',
-					'name'        => __( 'Single Restriction Message', 'edd-cr' ),
-					'desc'        => __( 'When access is restricted by a single product, this message will show to the user when they do not have access. <code>{product_name}</code> will be replaced by the restriction requirements.', 'edd-cr' ),
-					'type'        => 'rich_editor',
-					'allow_blank' => false,
-					'size'        => 5,
-					'std'         => edd_cr_get_single_restriction_message(),
-				),
-				array(
-					'id'          => 'edd_cr_multi_resriction_message',
-					'name'        => __( 'Multiple Restriction Message', 'edd-cr' ),
-					'desc'        => __( 'When access is restricted by multiple products, this message will show to the user when they do not have access. <code>{product_names}</code> will be replaced by a list of the restriction requirements.', 'edd-cr' ),
-					'type'        => 'rich_editor',
-					'allow_blank' => false,
-					'size'        => 5,
-					'std'         => edd_cr_get_multi_restriction_message(),
-				),
-				array(
-					'id'          => 'edd_cr_any_resriction_message',
-					'name'        => __( 'Restriction for "Any Product"', 'edd-cr' ),
-					'desc'        => __( 'When access to content is restricted to anyone who has made a purchase, this is the message displayed to people without a purchase.', 'edd-cr' ),
-					'type'        => 'rich_editor',
-					'allow_blank' => false,
-					'size'        => 5,
-					'std'         => edd_cr_get_any_restriction_message(),
-				),
-			);
-
-			$settings = array_merge( $settings, $new_settings );
-
-			return $settings;
 		}
 	}
 }
@@ -224,7 +167,7 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 function EDD_Content_Restriction_load() {
 	if ( ! class_exists( 'Easy_Digital_Downloads' ) ) {
 		if ( ! class_exists( 'EDD_Extension_Activation' ) ) {
-			require_once 'includes/class.extension-activation.php';
+			require_once 'includes/libraries/class.extension-activation.php';
 		}
 
 		$activation = new EDD_Extension_Activation( plugin_dir_path( __FILE__ ), basename( __FILE__ ) );
@@ -242,9 +185,7 @@ add_action( 'plugins_loaded', 'EDD_Content_Restriction_load' );
  * @return      void
  */
 function eddcr_install() {
-
 	EDD_Content_Restriction::instance();
 	add_option( 'eddcr_version', EDD_CONTENT_RESTRICTION_VER, '', false );
-
 }
 register_activation_hook( __FILE__, 'eddcr_install' );
