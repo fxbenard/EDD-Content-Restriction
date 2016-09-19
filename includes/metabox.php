@@ -23,7 +23,7 @@ function edd_cr_add_meta_box() {
 	global $post;
 
 	$post_types     = get_post_types( array( 'show_ui' => true ) );
-	$excluded_types = array( 'download', 'edd_payment', 'reply', 'acf', 'deprecated_log' );
+	$excluded_types = array( 'download', 'edd_payment', 'reply', 'acf', 'deprecated_log', 'edd-checkout-fields', 'fes-forms' );
 
 	if( ! in_array( get_post_type( $post->ID ), apply_filters( 'edd_cr_excluded_post_types', $excluded_types ) ) ) {
 		add_meta_box(

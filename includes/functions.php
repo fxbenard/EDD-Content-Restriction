@@ -16,9 +16,9 @@ if( ! defined( 'ABSPATH' ) ) exit;
  * Check to see if a user has access to a post/page
  *
  * @since       2.0
- * @param       int $user_id The ID of the user to check
+ * @param       int|bool $user_id Optional. The ID of the user to check. Default is false.
  * @param       array $restricted_to The array of downloads for a post/page
- * @param       int $post_id The ID of the object we are viewing
+ * @param       int|false $post_id Optional. The ID of the object we are viewing. Default is false.
  * @return      array $return An array containing the status and optional message
  */
 function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = false ) {
@@ -105,7 +105,8 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 		if( $has_access == false ) {
 
 			if( $restricted_count > 1 ) {
-				$message = edd_cr_get_single_restriction_message();
+				$message = edd_cr_get_multi_restriction_message();
+
 				$product_list = '';
 
 				if( ! empty( $products ) ) {
@@ -120,7 +121,7 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 
 				}
 
-				$message = str_replace( '{product_names', $product_list, $message );
+				$message = str_replace( '{product_names}', $product_list, $message );
 
 			} else {
 
