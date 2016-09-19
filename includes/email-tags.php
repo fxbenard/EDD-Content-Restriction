@@ -38,7 +38,7 @@ function edd_cr_add_template_tags( $payment_id ) {
 	$meta = edd_cr_get_restricted_pages( $payment_id );
 
 	// No pages? Quit!
-	if ( empty( $meta ) ) {
+	if ( ! is_array( $meta ) || empty( $meta ) ) {
 		return '';
 	}
 
