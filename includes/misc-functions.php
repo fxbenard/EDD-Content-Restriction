@@ -19,7 +19,7 @@ if( ! defined( 'ABSPATH' ) ) {
  *
  * @since       1.3.0
  * @param       int $payment_id The ID of this payment
- * @return      array $meta The list of accessible files
+ * @return      array $posts The list of accessible posts
  */
 function edd_cr_get_restricted_pages( $payment_id = 0 ) {
 	if ( empty( $payment_id ) ) {
@@ -27,7 +27,6 @@ function edd_cr_get_restricted_pages( $payment_id = 0 ) {
 	}
 
 	$posts    = array();
-	$post_ids = array();
 	$files    = edd_get_payment_meta_downloads( $payment_id );
 
 	if ( ! empty( $files ) && is_array( $files ) ) {
@@ -37,23 +36,13 @@ function edd_cr_get_restricted_pages( $payment_id = 0 ) {
 			$meta = get_post_meta( $download_id, '_edd_cr_protected_post' );
 
 			if ( $meta ) {
-				$post_ids = array_merge( $post_ids, $meta );
+				foreach ( $meta as $item ) {
+					if( get_post_type( $item ) !== 'revision' ) {
+						$posts[ $download_id ][ $item ] = get_the_title( $item );
+					}
+				}
 			}
 		}
-	}
-
-	$post_ids = array_unique( array_map( 'absint', $post_ids ) );
-
-	if ( ! empty( $post_ids ) ) {
-		$args = array(
-			'post_type' => 'any',
-			'nopaging'  => true,
-			'post__in'  => $post_ids
-		);
-
-		$query = new WP_Query( $args );
-
-		$posts = $query->posts;
 	}
 
 	return $posts;
