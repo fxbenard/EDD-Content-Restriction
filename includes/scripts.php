@@ -17,6 +17,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Enqueue scripts if necessary
  *
+ * @since       2.2.0
+ * @return      void
+ */
+function edd_cr_scripts() {
+	// Only enqueue if this is the success page
+	if ( edd_is_success_page() ) {
+		wp_enqueue_style( 'edd-cr', EDD_CONTENT_RESTRICTION_URL . 'assets/css/edd-cr.css' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'edd_cr_scripts' );
+
+
+/**
+ * Enqueue admin scripts if necessary
+ *
  * @since       1.0.0
  * @global      object $post The post/page we are editing
  * @return      void

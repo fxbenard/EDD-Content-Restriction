@@ -45,8 +45,12 @@ function edd_cr_add_template_tags( $payment_id ) {
 	$page_list  = '<div class="edd_cr_accessible_pages">' . __( 'Pages', 'edd-cr' ) . '</div>';
 	$page_list .= '<ul>';
 
-	foreach ( $meta as $post ) {
-		$page_list .= '<li><a href="' . esc_url( get_permalink( $post->ID ) ) . '">' . $post->post_title . '</a></li>';
+	foreach ( $meta as $download_id => $pages ) {
+		$page_list .= '<lh>' . get_the_title( $download_id ) . '</lh>';
+
+		foreach ( $pages as $page_id => $page_title ) {
+			$page_list .= '<li><a href="' . esc_url( get_permalink( $page_id ) ) . '">' . $page_title . '</a></li>';
+		}
 	}
 
 	$page_list .= '</ul>';
