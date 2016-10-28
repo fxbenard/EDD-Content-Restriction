@@ -150,8 +150,25 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 				$license = new EDD_License( __FILE__, 'Content Restriction', EDD_CONTENT_RESTRICTION_VER, 'Pippin Williamson' );
 			}
 
+			// Register settings section
+			add_filter( 'edd_settings_sections_extensions', array( $this, 'settings_section' ), 1 );
+
 			// Register settings
 			add_filter( 'edd_settings_extensions', array( $this, 'settings' ), 1 );
+		}
+
+
+		/**
+		 * Add settings section
+		 *
+		 * @access      public
+		 * @since       2.1.5
+		 * @param       array $sections The existing EDD Extensions settings sections array
+		 * @return      array The modified EDD Extensions settings section array
+		 */
+		public function settings_section( $sections ) {
+			$sections['edd-cr-settings'] = __( 'Content Restriction', 'edd-cr' );
+			return $sections;
 		}
 
 
@@ -206,9 +223,11 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 				),
 			);
 
-			$settings = array_merge( $settings, $new_settings );
+			if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
+				$new_settings = array( 'edd-cr-settings' => $new_settings );
+			}
 
-			return $settings;
+			return array_merge( $settings, $new_settings );
 		}
 	}
 }
