@@ -52,6 +52,12 @@ function edd_cr_add_settings( $settings ) {
 				'type'  => 'checkbox',
 			),
 			array(
+				'id'    => 'edd_content_restriction_include_bundled_products',
+				'name'  => __( 'Include Bundled Products', 'edd-cr' ),
+				'desc'  => __( 'Should products purchased as part of a bundle be considered purchased when determining access rights?', 'edd-cr' ),
+				'type'  => 'checkbox'
+			),
+			array(
 				'id'          => 'edd_cr_single_resriction_message',
 				'name'        => __( 'Single Restriction Message', 'edd-cr' ),
 				'desc'        => __( 'When access is restricted by a single product, this message will show to the user when they do not have access. <code>{product_name}</code> will be replaced by the restriction requirements.', 'edd-cr' ),
