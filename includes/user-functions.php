@@ -120,22 +120,18 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 				}
 			}
 		}
+
+		if ( ! isset( $message ) ) {
+			$message = __( 'This content is restricted to buyers.', 'edd-cr' );
+		}
 	} else {
 		// Just in case we're checking something unrestricted...
 		$has_access = true;
 	}
 
 	// Allow plugins to modify the restriction requirements
-	$has_access = apply_filters( 'edd_cr_user_can_access', $has_access, $user_id, $restricted_to );
-
-	if ( isset( $message ) ) {
-		$return['message'] = $message;
-	} else {
-		// Allow plugins to modify the restriction message
-		$return['message'] = apply_filters( 'edd_cr_user_can_access_message', __( 'This content is restricted to buyers.', 'edd-cr' ), $user_id, $restricted_to );
-	}
-
-	$return['status'] = $has_access;
+	$return['status']  = apply_filters( 'edd_cr_user_can_access', $has_access, $user_id, $restricted_to );
+	$return['message'] = apply_filters( 'edd_cr_user_can_access_message', $message, $user_id, $restricted_to );
 
 	return $return;
 }
