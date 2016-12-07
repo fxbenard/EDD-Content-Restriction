@@ -126,7 +126,8 @@ function edd_cr_user_has_license( $has_access, $user_id, $restricted_to ) {
 				}
 
 			} else {
-				if( 'expired' !== $status && 'draft' !== $status ) {
+
+				if( 'expired' !== $status && 'draft' !== $post_status ) {
 
 					$has_access = true;
 					break;
