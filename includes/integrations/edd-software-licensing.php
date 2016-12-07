@@ -26,8 +26,8 @@ function edd_cr_add_sl_metabox_field( $post_id, $restricted_to, $restricted_vari
 	echo '<p>';
 		echo '<label for="edd_cr_sl_require_active_license">';
 			echo '<input type="checkbox" name="edd_cr_sl_require_active_license" id="edd_cr_sl_require_active_license" value="1"' . checked( '1', $active_license, false ) . '/>&nbsp;';
-			echo __( 'Require an active license key?', 'edd-sl' );
-			echo '<span class="edd-help-tip dashicons dashicons-editor-help" alt="f223" title="<strong>' . __( 'Require an active license key?', 'edd-cr' ) . '</strong> ' . sprintf( __( 'Only customers with an active license will be able to view the content. This setting is only applied if the selected %s has licensing enabled.', 'edd-sl' ), edd_get_label_singular( true ) ) . '"></span>';
+			echo __( 'Require a valid license key?', 'edd-sl' );
+			echo '<span class="edd-help-tip dashicons dashicons-editor-help" alt="f223" title="<strong>' . __( 'Require a valid license key?', 'edd-cr' ) . '</strong> ' . sprintf( __( 'Only customers with a valid license key will be able to view the content. This setting is only applied if the selected %s has licensing enabled.', 'edd-sl' ), edd_get_label_singular( true ) ) . '"></span>';
 		echo '</label>';
 	echo '</p>';
 }
@@ -66,7 +66,6 @@ add_action( 'edd_cr_save_meta_data', 'edd_cr_sl_metabox_save', 10, 2 );
  * @return      bool $has_access The updated access condition for the user
  */
 function edd_cr_user_has_license( $has_access, $user_id, $restricted_to ) {
-	$licensed = array();
 
 	// Only proceed if the setting is enabled
 	if ( ! $has_access || ! get_post_meta( get_the_ID(), '_edd_cr_sl_require_active_license', true ) ) {
@@ -81,79 +80,64 @@ function edd_cr_user_has_license( $has_access, $user_id, $restricted_to ) {
 
 	}
 
-	foreach ( $restricted_to as $item => $data ) {
+	$user_licenses = edd_software_licensing()->get_license_keys_of_user( $user_id );
 
-		// Only proceed if licensing is enabled for this download
-		if ( get_post_meta( $data['download'], '_edd_sl_enabled', true ) ) {
+	// Only proceed if the user has actually purchased a license
+	if ( empty( $user_licenses ) ) {
 
-			// Enforce author access
-			if ( (int) get_post_field( 'post_author', $data['download'] ) !== (int) $user_id && is_user_logged_in() ) {
-				$licensed[] = $data;
-			}
-		}
+		return $has_access;
+
 	}
 
-	// Only proceed if there are licensed products
-	if ( count( $licensed )  > 0 ) {
+	foreach ( $restricted_to as $item => $data ) {
 
-		$user_licenses = edd_software_licensing()->get_license_keys_of_user( $user_id );
+		if( ! get_post_meta( $data['download'], '_edd_sl_enabled', true ) ) {
 
-		// Only proceed if the user has actually purchased a license
-		if ( empty( $user_licenses ) ) {
-
-			return $has_access;
+			// No need to check if licensing is not enabled on the download
+			continue;
 
 		}
 
-		foreach ( $licensed as $item => $data ) {
 
-			foreach( $user_licenses as $license_item => $license_data ) {
+		foreach( $user_licenses as $license_item => $license_data ) {
 
-				$license_download = (int) edd_software_licensing()->get_download_id( $license_data->ID );
+			$license_download = (int) edd_software_licensing()->get_download_id( $license_data->ID );
 
-				if ( $license_download !== (int) $data['download'] ) {
+			if ( $license_download !== (int) $data['download'] ) {
 
-					continue;
+				// License does not belong to the product we're checking
+				continue;
+
+			}
+
+			// We have a related license so set access to false
+			$has_access  = false;
+			$status      = edd_software_licensing()->get_license_status( $license_data->ID );
+			$post_status = get_post_status( $license_data->ID );
+
+			if ( edd_has_variable_prices( $data['download'] ) && 'all' !== strtolower( $data['price_id'] ) ) {
+
+				$license_price_id = (int) edd_software_licensing()->get_price_id( $license_data->ID );
+
+				if ( $license_price_id === (int) $data['price_id'] && 'expired' !== $status && 'draft' !== $post_status ) {
+					$has_access = true;
+					break;
+
+				}
+
+			} elseif( ! edd_has_variable_prices( $data['download'] ) ) {
+				if( 'expired' !== $status && 'draft' !== $status ) {
+
+					$has_access = true;
+					break;
 
 				}
 
-				if ( ! empty( $data['price_id'] ) ) {
-
-					$license_price_id = edd_software_licensing()->get_price_id( $license_data->ID );
-
-					if ( $license_price_id == $data['price_id'] ) {
-
-						// Make sure the license is active
-						$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
-						$post_status    = get_post_status( $license_data->ID );
-
-						if ( $license_status === 'expired' || $post_status === 'draft' ) {
-							unset( $licensed[ $item ] );
-						}
-					}
-
-				} else {
-
-					// Make sure the license is active
-					$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
-					$post_status    = get_post_status( $license_data->ID );
-
-					if ( $license_status === 'expired' || $post_status === 'draft' ) {
-
-						unset( $licensed[ $item ] );
-
-					}
-
-				}
 
 			}
 
 		}
 
-		// If no licensed products remain, set to false
-		if ( count( $licensed ) == 0 ) {
-			$has_access = false;
-		}
 	}
 
 	return $has_access;
