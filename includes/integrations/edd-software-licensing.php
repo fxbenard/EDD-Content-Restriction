@@ -115,17 +115,17 @@ function edd_cr_user_has_license( $has_access, $user_id, $restricted_to ) {
 			$status      = edd_software_licensing()->get_license_status( $license_data->ID );
 			$post_status = get_post_status( $license_data->ID );
 
-			if ( edd_has_variable_prices( $data['download'] ) && 'all' !== strtolower( $data['price_id'] ) ) {
+			if ( edd_has_variable_prices( $data['download'] ) ) {
 
 				$license_price_id = (int) edd_software_licensing()->get_price_id( $license_data->ID );
 
-				if ( $license_price_id === (int) $data['price_id'] && 'expired' !== $status && 'draft' !== $post_status ) {
+				if ( ( 'all' === strtolower( $data['price_id'] ) || $license_price_id === (int) $data['price_id'] ) && 'expired' !== $status && 'draft' !== $post_status ) {
 					$has_access = true;
 					break;
 
 				}
 
-			} elseif( ! edd_has_variable_prices( $data['download'] ) ) {
+			} else {
 				if( 'expired' !== $status && 'draft' !== $status ) {
 
 					$has_access = true;
