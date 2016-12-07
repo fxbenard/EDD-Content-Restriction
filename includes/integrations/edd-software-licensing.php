@@ -68,62 +68,90 @@ function edd_cr_user_has_license( $has_access, $user_id, $restricted_to ) {
 	$licensed = array();
 
 	// Only proceed if the setting is enabled
-	if ( $has_access && get_post_meta( get_the_ID(), '_edd_cr_sl_require_active_license', true ) ) {
-		if ( $restricted_to && is_array( $restricted_to ) ) {
-			foreach ( $restricted_to as $item => $data ) {
+	if ( ! $has_access || ! get_post_meta( get_the_ID(), '_edd_cr_sl_require_active_license', true ) ) {
 
-				// Only proceed if licensing is enabled for this download
-				if ( get_post_meta( $data['download'], '_edd_sl_enabled', true ) ) {
+		return $has_access;
 
-					// Enforce author access
-					if ( (int) get_post_field( 'post_author', $data['download'] ) !== (int) $user_id && is_user_logged_in() ) {
-						$licensed[] = $data;
-					}
-				}
+	}
+
+	if( ! $restricted_to || ! is_array( $restricted_to ) ) {
+
+		return $has_access;
+
+	}
+
+	foreach ( $restricted_to as $item => $data ) {
+
+		// Only proceed if licensing is enabled for this download
+		if ( get_post_meta( $data['download'], '_edd_sl_enabled', true ) ) {
+
+			// Enforce author access
+			if ( (int) get_post_field( 'post_author', $data['download'] ) !== (int) $user_id && is_user_logged_in() ) {
+				$licensed[] = $data;
 			}
+		}
+	}
 
-			// Only proceed if there are licensed products
-			if ( count( $licensed )  > 0 ) {
-				$user_licenses = edd_software_licensing()->get_license_keys_of_user( $user_id );
+	// Only proceed if there are licensed products
+	if ( count( $licensed )  > 0 ) {
 
-				// Only proceed if the user has actually purchased a license
-				if ( $user_licenses ) {
-					foreach ( $licensed as $item => $data ) {
-						foreach( $user_licenses as $license_item => $license_data ) {
-							$license_download = edd_software_licensing()->get_download_id( $license_data->ID );
+		$user_licenses = edd_software_licensing()->get_license_keys_of_user( $user_id );
 
-							if ( $license_download == $data['download'] ) {
-								if ( ! empty( $data['price_id'] ) ) {
-									$license_price_id = edd_software_licensing()->get_price_id( $license_data->ID );
+		// Only proceed if the user has actually purchased a license
+		if ( empty( $user_licenses ) ) {
 
-									if ( $license_price_id == $data['price_id'] ) {
-										// Make sure the license is active
-										$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
-										$post_status    = get_post_status( $license_data->ID );
+			return $has_access;
 
-										if ( $license_status === 'expired' || $post_status === 'draft' ) {
-											unset( $licensed[ $item ] );
-										}
-									}
-								} else {
-									// Make sure the license is active
-									$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
-									$post_status    = get_post_status( $license_data->ID );
+		}
 
-									if ( $license_status === 'expired' || $post_status === 'draft' ) {
-										unset( $licensed[ $item ] );
-									}
-								}
-							}
+		foreach ( $licensed as $item => $data ) {
+
+			foreach( $user_licenses as $license_item => $license_data ) {
+
+				$license_download = (int) edd_software_licensing()->get_download_id( $license_data->ID );
+
+				if ( $license_download !== (int) $data['download'] ) {
+
+					continue;
+
+				}
+
+				if ( ! empty( $data['price_id'] ) ) {
+
+					$license_price_id = edd_software_licensing()->get_price_id( $license_data->ID );
+
+					if ( $license_price_id == $data['price_id'] ) {
+
+						// Make sure the license is active
+						$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
+						$post_status    = get_post_status( $license_data->ID );
+
+						if ( $license_status === 'expired' || $post_status === 'draft' ) {
+							unset( $licensed[ $item ] );
 						}
 					}
 
-					// If no licensed products remain, set to false
-					if ( count( $licensed ) == 0 ) {
-						$has_access = false;
+				} else {
+
+					// Make sure the license is active
+					$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
+					$post_status    = get_post_status( $license_data->ID );
+
+					if ( $license_status === 'expired' || $post_status === 'draft' ) {
+
+						unset( $licensed[ $item ] );
+
 					}
+
 				}
+
 			}
+
+		}
+
+		// If no licensed products remain, set to false
+		if ( count( $licensed ) == 0 ) {
+			$has_access = false;
 		}
 	}
 
