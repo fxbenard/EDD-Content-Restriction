@@ -15,25 +15,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 /**
- * Add settings
+ * Add metabox field
  *
  * @since       2.2.0
- * @param       array $sections The existing extensions sections
- * @return      array The modified extensions settings
+ * @param       int $post_id The ID of the post we are editing
+ * @return      void
  */
-function edd_cr_add_sl_settings( $settings ) {
-	$new_settings = array(
-		array(
-			'id'    => 'edd_cr_sl_enforce_active_license',
-			'name'  => __( 'Enforce Active Licenses', 'edd-cr' ),
-			'desc'  => __( 'Require an active license for licensed products.', 'edd-cr' ),
-			'type'  => 'checkbox'
-			)
-	);
-
-	return array_merge( $settings, $new_settings );
+function edd_cr_add_sl_metabox_field( $post_id, $restricted_to, $restricted_variable ) {
+	$active_license = get_post_meta( $post_id, '_edd_cr_sl_require_active_license', true );
+	echo '<p>';
+		echo '<label for="edd_cr_sl_require_active_license" title="' . sprintf( __( 'Only customers with an active license will be able to view the content. This setting is only applied if the selected %s has licensing enabled.', 'edd-sl' ), edd_get_label_singular( true ) ) . '">';
+			echo '<input type="checkbox" name="edd_cr_sl_require_active_license" id="edd_cr_sl_require_active_license" value="1"' . checked( '1', $active_license, false ) . '/>&nbsp;';
+			echo __( 'Active Licenses Only?', 'edd-sl' );
+		echo '</label>';
+	echo '</p>';
 }
-add_filter( 'edd_cr_settings', 'edd_cr_add_sl_settings' );
+add_action( 'edd_cr_metabox', 'edd_cr_add_sl_metabox_field', 10, 3 );
+
+
+/**
+ * Update data on save
+ *
+ * @since       2.2.0
+ * @param       int $post_id The ID of the post we are editing
+ * @param       array $data The submitted data
+ * @return      void
+ */
+function edd_cr_sl_metabox_save( $post_id, $data ) {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	if ( isset( $data['edd_cr_sl_require_active_license'] ) ) {
+		update_post_meta( $post_id, '_edd_cr_sl_require_active_license', '1' );
+	} else {
+		delete_post_meta( $post_id, '_edd_cr_sl_require_active_license' );
+	}
+}
+add_action( 'edd_cr_save_meta_data', 'edd_cr_sl_metabox_save', 10, 2 );
 
 
 /**
@@ -49,7 +68,7 @@ function edd_cr_user_has_license( $has_access, $user_id, $restricted_to ) {
 	$licensed = array();
 
 	// Only proceed if the setting is enabled
-	if ( $has_access && edd_get_option( 'edd_cr_sl_enforce_active_license', false ) ) {
+	if ( $has_access && get_post_meta( get_the_ID(), '_edd_cr_sl_require_active_license', true ) ) {
 		if ( $restricted_to && is_array( $restricted_to ) ) {
 			foreach ( $restricted_to as $item => $data ) {
 
