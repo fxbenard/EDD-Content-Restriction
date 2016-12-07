@@ -93,6 +93,21 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 					}
 				}
 			}
+
+			if ( ! $has_access && is_user_logged_in() && edd_get_option( 'edd_content_restriction_include_bundled_products', false ) ) {
+				$purchased = edd_get_users_purchased_products( $user_id );
+
+				foreach ( $purchased as $item ) {
+					if ( edd_is_bundled_product( $item->ID ) ) {
+						$bundled = (array) edd_get_bundled_products( $item->ID );
+
+						if ( in_array( $data['download'], $bundled ) ) {
+							$has_access = true;
+							break;
+						}
+					}
+				}
+			}
 		}
 
 		if ( $has_access == false ) {
