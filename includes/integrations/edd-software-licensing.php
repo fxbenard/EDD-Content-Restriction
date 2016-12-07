@@ -98,17 +98,19 @@ function edd_cr_user_has_license( $has_access, $user_id, $restricted_to ) {
 
 									if ( $license_price_id == $data['price_id'] ) {
 										// Make sure the license is active
-										$status = edd_software_licensing()->get_license_status( $license_data->ID );
+										$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
+										$post_status    = get_post_status( $license_data->ID );
 
-										if ( $status == 'expired' ) {
+										if ( $license_status === 'expired' || $post_status === 'draft' ) {
 											unset( $licensed[ $item ] );
 										}
 									}
 								} else {
 									// Make sure the license is active
-									$status = edd_software_licensing()->get_license_status( $license_data->ID );
+									$license_status = edd_software_licensing()->get_license_status( $license_data->ID );
+									$post_status    = get_post_status( $license_data->ID );
 
-									if ( $status == 'expired' ) {
+									if ( $license_status === 'expired' || $post_status === 'draft' ) {
 										unset( $licensed[ $item ] );
 									}
 								}
