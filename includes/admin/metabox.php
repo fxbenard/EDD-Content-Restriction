@@ -91,7 +91,7 @@ function edd_cr_render_meta_box( $post_id ) {
 			</table>
 			<p>
 				<label for="edd_cr_restricted_message"><strong><?php _e( 'Specify a custom restriction message for this content, or leave blank to use the global setting.', 'edd-cr' ); ?></strong></label>
-				<?php wp_editor( stripslashes( $message ), 'edd_cr_restricted_message', array( 'textarea_name' => 'edd_cr_restricted_message', 'textarea_rows' => 5 ) ); ?>
+				<?php wp_editor( wptexturize( stripslashes( $message ) ), 'edd_cr_restricted_message', array( 'textarea_name' => 'edd_cr_restricted_message', 'textarea_rows' => 5 ) ); ?>
 			</p>
 		</div>
 		<?php
