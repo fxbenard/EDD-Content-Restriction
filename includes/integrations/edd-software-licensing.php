@@ -24,9 +24,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 function edd_cr_add_sl_metabox_field( $post_id, $restricted_to, $restricted_variable ) {
 	$active_license = get_post_meta( $post_id, '_edd_cr_sl_require_active_license', true );
 	echo '<p>';
-		echo '<label for="edd_cr_sl_require_active_license" title="' . sprintf( __( 'Only customers with an active license will be able to view the content. This setting is only applied if the selected %s has licensing enabled.', 'edd-sl' ), edd_get_label_singular( true ) ) . '">';
+		echo '<label for="edd_cr_sl_require_active_license">';
 			echo '<input type="checkbox" name="edd_cr_sl_require_active_license" id="edd_cr_sl_require_active_license" value="1"' . checked( '1', $active_license, false ) . '/>&nbsp;';
-			echo __( 'Active Licenses Only?', 'edd-sl' );
+			echo __( 'Require an active license key?', 'edd-sl' );
+			echo '<span class="edd-help-tip dashicons dashicons-editor-help" alt="f223" title="<strong>' . __( 'Require an active license key?', 'edd-cr' ) . '</strong> ' . sprintf( __( 'Only customers with an active license will be able to view the content. This setting is only applied if the selected %s has licensing enabled.', 'edd-sl' ), edd_get_label_singular( true ) ) . '"></span>';
 		echo '</label>';
 	echo '</p>';
 }
