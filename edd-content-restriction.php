@@ -104,6 +104,11 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 			}
 
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/modules/menus.php';
+
+			// Add integrations
+			if ( class_exists( 'EDD_Software_Licensing' ) ) {
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/integrations/edd-software-licensing.php';
+			}
 		}
 
 
