@@ -91,12 +91,7 @@ function edd_cr_render_meta_box( $post_id ) {
 			</table>
 			<p>
 				<label for="edd_cr_restricted_message"><strong><?php _e( 'Specify a custom restriction message for this content, or leave blank to use the global setting.', 'edd-cr' ); ?></strong></label>
-				<?php
-					echo EDD()->html->textarea( array(
-						'name'  => 'edd_cr_restricted_message',
-						'value' => $message
-					) );
-				?>
+				<?php wp_editor( stripslashes( $message ), 'edd_cr_restricted_message', array( 'textarea_name' => 'edd_cr_restricted_message', 'textarea_rows' => 5 ) ); ?>
 			</p>
 		</div>
 		<?php
@@ -216,7 +211,7 @@ function edd_cr_save_meta_data( $post_id ) {
 	}
 
 	if ( ! empty( $_POST['edd_cr_restricted_message'] ) ) {
-		update_post_meta( $post_id, '_edd_cr_restricted_message', esc_attr( $_POST['edd_cr_restricted_message'] ) );
+		update_post_meta( $post_id, '_edd_cr_restricted_message', trim( wp_kses_post( $_POST['edd_cr_restricted_message'] ) ) );
 	} else {
 		delete_post_meta( $post_id, '_edd_cr_restricted_message' );
 	}
