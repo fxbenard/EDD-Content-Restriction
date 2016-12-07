@@ -103,7 +103,7 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 
 						if ( in_array( $data['download'], $bundled ) ) {
 							$has_access = true;
-							continue;
+							break;
 						}
 					}
 				}
