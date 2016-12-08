@@ -55,6 +55,7 @@ function edd_cr_render_meta_box( $post_id ) {
 
 	$downloads     = get_posts( array( 'post_type' => 'download', 'posts_per_page' => -1 ) );
 	$restricted_to = get_post_meta( $post->ID, '_edd_cr_restricted_to', true );
+	$message       = get_post_meta( $post->ID, '_edd_cr_restricted_message', true );
 
 	if ( $downloads ) {
 		?>
@@ -88,6 +89,10 @@ function edd_cr_render_meta_box( $post_id ) {
 					</tr>
 				</tbody>
 			</table>
+			<p>
+				<label for="edd_cr_restricted_message"><strong><?php _e( 'Specify a custom restriction message for this content, or leave blank to use the global setting.', 'edd-cr' ); ?></strong></label>
+				<?php wp_editor( wptexturize( stripslashes( $message ) ), 'edd_cr_restricted_message', array( 'textarea_name' => 'edd_cr_restricted_message', 'textarea_rows' => 5 ) ); ?>
+			</p>
 		</div>
 		<?php
 	}
@@ -203,6 +208,12 @@ function edd_cr_save_meta_data( $post_id ) {
 		}
 	} else {
 		delete_post_meta( $post_id, '_edd_cr_restricted_to' );
+	}
+
+	if ( ! empty( $_POST['edd_cr_restricted_message'] ) ) {
+		update_post_meta( $post_id, '_edd_cr_restricted_message', trim( wp_kses_post( $_POST['edd_cr_restricted_message'] ) ) );
+	} else {
+		delete_post_meta( $post_id, '_edd_cr_restricted_message' );
 	}
 
 	do_action( 'edd_cr_save_meta_data', $post_id, $_POST );

@@ -136,6 +136,10 @@ function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = fa
 			}
 		}
 
+		// Override message if per-content message is defined
+		$content_message = get_post_meta( $post_id, '_edd_cr_restricted_message', true );
+		$message         = ( isset( $content_message ) && $content_message !== '' ? $content_message : $message );
+
 		if ( ! isset( $message ) ) {
 			$message = __( 'This content is restricted to buyers.', 'edd-cr' );
 		}
