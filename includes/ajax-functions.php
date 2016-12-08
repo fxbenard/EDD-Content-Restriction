@@ -9,7 +9,9 @@
 
 
 // Exit if accessed directly
-if( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 
 /**
@@ -19,7 +21,7 @@ if( ! defined( 'ABSPATH' ) ) exit;
  * @return      void
  */
 function edd_cr_check_for_download_price_variations() {
-	if( ! current_user_can( 'edit_products' ) ) {
+	if ( ! current_user_can( 'edit_products' ) ) {
 		die( '-1' );
 	}
 
@@ -27,19 +29,23 @@ function edd_cr_check_for_download_price_variations() {
 	$key         = ( isset( $_POST['key'] ) ? absint( $_POST['key'] ) : 0 );
 	$download    = get_post( $download_id );
 
-	if( 'download' != $download->post_type ) {
+	if ( 'download' != $download->post_type ) {
 		die( '-2' );
 	}
 
 	if ( edd_has_variable_prices( $download_id ) ) {
 		$variable_prices = edd_get_variable_prices( $download_id );
+
 		if ( $variable_prices ) {
 			$ajax_response = '<select class="edd_price_options_select edd-select edd-select edd_cr_download" name="edd_cr_download[' . $key . '][price_id]">';
 				$ajax_response .= '<option value="all">' . esc_html( __( 'All prices', 'edd-cr' ) ) . '</option>';
-				foreach ( $variable_prices as $price_id => $price ) {
-					$ajax_response .= '<option value="' . esc_attr( $price_id ) . '">' . esc_html( $price['name'] ) . '</option>';
-				}
+
+			foreach ( $variable_prices as $price_id => $price ) {
+				$ajax_response .= '<option value="' . esc_attr( $price_id ) . '">' . esc_html( $price['name'] ) . '</option>';
+			}
+
 			$ajax_response .= '</select>';
+
 			echo $ajax_response;
 		}
 	}
@@ -47,4 +53,3 @@ function edd_cr_check_for_download_price_variations() {
 	edd_die();
 }
 add_action( 'wp_ajax_edd_cr_check_for_download_price_variations', 'edd_cr_check_for_download_price_variations' );
-

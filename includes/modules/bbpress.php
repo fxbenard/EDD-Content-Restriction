@@ -9,7 +9,9 @@
 
 
 // Exit if accessed directly
-if( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 
 /**
@@ -23,49 +25,42 @@ function edd_cr_can_view_bbpress() {
 
 	$return = true;
 
-	if( ! current_user_can( 'moderate' ) ) {
-
+	if ( ! current_user_can( 'moderate' ) ) {
 		$restricted_to = edd_cr_is_restricted( bbp_get_topic_id() );
 		$restricted_id = bbp_get_topic_id();
 
-		if( ! $restricted_to ) {
-
+		if ( ! $restricted_to ) {
 			$restricted_to = edd_cr_is_restricted( bbp_get_forum_id() ); // check for parent forum restriction
 			$restricted_id = bbp_get_forum_id();
 
-			if( ! $restricted_to ) {
-
+			if ( ! $restricted_to ) {
 				$ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
 
 				if ( ! empty( $ancestors ) ) {
 
 					// Loop through parents
 					foreach ( (array) $ancestors as $parent_id ) {
-
 						$restricted_to = edd_cr_is_restricted( $parent_id );
 						$restricted_id = $parent_id;
 
-						if( $restricted_to ) {
+						if ( $restricted_to ) {
 							break;
 						}
-
 					}
-
 				}
-
 			}
-
 		}
 
 		$has_access = edd_cr_user_can_access( $user_ID, $restricted_to, $restricted_id );
 
-		if( $has_access['status'] == false ) {
+		if ( $has_access['status'] == false ) {
 			$return = false;
 		}
 	}
 
 	return $return;
 }
+
 
 /**
  * Hides all topics in a restricted forum for non active users
@@ -78,36 +73,29 @@ function edd_cr_can_view_bbpress() {
 function edd_cr_filter_bbp_topics_list( $has_topics, $query ) {
 	global $user_ID;
 
-	if( ! current_user_can( 'moderate' ) ) {
-
-		if( bbp_is_single_forum() ) {
-
+	if ( ! current_user_can( 'moderate' ) ) {
+		if ( bbp_is_single_forum() ) {
 			$restricted_to = edd_cr_is_restricted( bbp_get_forum_id() );
 
-			if( ! $restricted_to ) {
-
+			if ( ! $restricted_to ) {
 				$ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
 
 				if ( ! empty( $ancestors ) ) {
 
 					// Loop through parents
 					foreach ( (array) $ancestors as $parent_id ) {
-
 						$restricted_to = edd_cr_is_restricted( $parent_id );
 
-						if( $restricted_to ) {
+						if ( $restricted_to ) {
 							break;
 						}
-
 					}
-
 				}
-
 			}
 
 			$has_access = edd_cr_user_can_access( $user_ID, $restricted_to );
 
-			if( $has_access['status'] == false ) {
+			if ( $has_access['status'] == false ) {
 				$has_topics = false;
 			}
 		}
@@ -133,41 +121,34 @@ function edd_cr_filter_replies( $content, $reply_id ) {
 
 	$return = $content;
 
-	if( ! current_user_can( 'moderate' ) ) {
-		$restricted_to    = edd_cr_is_restricted( bbp_get_topic_id() );
-		$restricted_id    = bbp_get_topic_id();
+	if ( ! current_user_can( 'moderate' ) ) {
+		$restricted_to = edd_cr_is_restricted( bbp_get_topic_id() );
+		$restricted_id = bbp_get_topic_id();
 
-		if( ! $restricted_to ) {
-
+		if ( ! $restricted_to ) {
 			$restricted_to = edd_cr_is_restricted( bbp_get_forum_id() ); // check for parent forum restriction
 			$restricted_id = bbp_get_forum_id();
 
-			if( ! $restricted_to ) {
-
+			if ( ! $restricted_to ) {
 				$ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
 
 				if ( ! empty( $ancestors ) ) {
 
 					// Loop through parents
 					foreach ( (array) $ancestors as $parent_id ) {
-
 						$restricted_to = edd_cr_is_restricted( $parent_id );
 
-						if( $restricted_to ) {
+						if ( $restricted_to ) {
 							break;
 						}
-
 					}
-
 				}
-
 			}
-
 		}
 
 		$has_access = edd_cr_user_can_access( $user_ID, $restricted_to, $restricted_id );
 
-		if( $has_access['status'] == false ) {
+		if ( $has_access['status'] == false ) {
 			$return = $has_access['message'];
 		} else {
 			$return = $content;
@@ -190,29 +171,24 @@ add_filter( 'bbp_get_reply_content', 'edd_cr_filter_replies', 2, 999 );
 function edd_cr_hide_new_topic_form( $form ) {
 	global $user_ID;
 
-	if( ! current_user_can( 'moderate' ) && bbp_current_user_can_publish_topics() ) {
+	if ( ! current_user_can( 'moderate' ) && bbp_current_user_can_publish_topics() ) {
 		$restricted_to  = edd_cr_is_restricted( bbp_get_forum_id() ); // Check for parent forum restriction
 		$restricted_id  = bbp_get_forum_id();
 
-		if( ! $restricted_to ) {
-
+		if ( ! $restricted_to ) {
 			$ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
 
 			if ( ! empty( $ancestors ) ) {
 
 				// Loop through parents
 				foreach ( (array) $ancestors as $parent_id ) {
-
 					$restricted_to = edd_cr_is_restricted( $parent_id );
 
-					if( $restricted_to ) {
+					if ( $restricted_to ) {
 						break;
 					}
-
 				}
-
 			}
-
 		}
 
 		$has_access = edd_cr_user_can_access( $user_ID, $restricted_to, $restricted_id );
@@ -235,38 +211,31 @@ add_filter( 'bbp_current_user_can_access_create_topic_form', 'edd_cr_hide_new_to
  * @return      mixed $return
  */
 function edd_cr_hide_new_replies_form( $retval ) {
-
 	global $user_ID;
 
-	if( ! current_user_can( 'moderate' ) && bbp_current_user_can_publish_replies() ) {
+	if ( ! current_user_can( 'moderate' ) && bbp_current_user_can_publish_replies() ) {
 		$restricted_to = edd_cr_is_restricted( bbp_get_topic_id() );
 		$restricted_id = bbp_get_topic_id();
 
-		if( ! $restricted_to ) {
+		if ( ! $restricted_to ) {
 			$restricted_to = edd_cr_is_restricted( bbp_get_forum_id() ); // check for parent forum restriction
 			$restricted_id = bbp_get_forum_id();
 
-			if( ! $restricted_to ) {
-
+			if ( ! $restricted_to ) {
 				$ancestors = array_reverse( (array) get_post_ancestors( bbp_get_forum_id() ) );
 
 				if ( ! empty( $ancestors ) ) {
 
 					// Loop through parents
 					foreach ( (array) $ancestors as $parent_id ) {
-
 						$restricted_to = edd_cr_is_restricted( $parent_id );
 
-						if( $restricted_to ) {
+						if ( $restricted_to ) {
 							break;
 						}
-
 					}
-
 				}
-
 			}
-
 		}
 
 		$has_access = edd_cr_user_can_access( $user_ID, $restricted_to );
@@ -274,7 +243,6 @@ function edd_cr_hide_new_replies_form( $retval ) {
 		if ( $has_access['status'] ) {
 			$retval = true;
 		}
-
 	}
 
 	return $retval;
@@ -293,7 +261,7 @@ add_filter( 'bbp_current_user_can_access_create_topic_form', 'edd_cr_hide_new_re
  * @return      string $translated_text The filtered feedback text
  */
 function edd_cr_topic_feedback_messages( $translated_text, $text, $domain ) {
-	switch( $translated_text ) {
+	switch ( $translated_text ) {
 		case 'You cannot reply to this topic.':
 			$translated_text = __( 'Topic creation is restricted to buyers.', 'edd-cr' );
 			break;
@@ -337,7 +305,7 @@ function edd_cr_forum_feedback_messages( $translated_text, $text, $domain ) {
 function edd_cr_apply_feedback_messages() {
 	global $user_ID;
 
-	if( bbp_is_single_topic() && ! edd_cr_can_view_bbpress() ) {
+	if ( bbp_is_single_topic() && ! edd_cr_can_view_bbpress() ) {
 		add_filter( 'gettext', 'edd_cr_topic_feedback_messages', 20, 3 );
 	} elseif( bbp_is_single_forum() && ! edd_cr_can_view_bbpress() ) {
 		add_filter( 'gettext', 'edd_cr_forum_feedback_messages', 20, 3 );

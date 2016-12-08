@@ -1,20 +1,31 @@
 <?php
+/**
+ * Handle upgrades
+ *
+ * @package     EDD\ContentRestriction\Upgrades
+ * @copyright   Copyright (c) 2013-2014, Pippin Williamson
+ * @since       2.2.0
+ */
+
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 
 /**
  * Shows upgrade notices
  *
- * @access      private
- * @since       2.8
+ * @since       2.0.0
  * @return      void
 */
-
-function eddcr_upgrade_notices() {
-
-	if( ! current_user_can( 'manage_shop_settings' ) ) {
+function edd_cr_upgrade_notices() {
+	if ( ! current_user_can( 'manage_shop_settings' ) ) {
 		return;
 	}
 
-	if( ! empty( $_GET['page'] ) && 'edd-upgrades' == $_GET['page'] ) {
+	if ( ! empty( $_GET['page'] ) && 'edd-upgrades' == $_GET['page'] ) {
 		return;
 	}
 
@@ -22,24 +33,25 @@ function eddcr_upgrade_notices() {
 
 	if ( ! $version || version_compare( $version, '2.0', '<' ) ) {
 		printf(
-			'<div class="updated"><p>' . esc_html__( 'Easy Digital Downloads needs to upgrade the Content Restriction settings, click %shere%s to start the upgrade.', 'eddcr' ) . '</p></div>',
+			'<div class="updated"><p>' . esc_html__( 'Easy Digital Downloads needs to upgrade the Content Restriction settings, click %shere%s to start the upgrade.', 'edd-cr' ) . '</p></div>',
 			'<a href="' . esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_cr_post_meta' ) ) . '">',
 			'</a>'
 		);
 	}
 
 }
-add_action( 'admin_notices', 'eddcr_upgrade_notices' );
+add_action( 'admin_notices', 'edd_cr_upgrade_notices' );
+
 
 /**
- * Upgrades all commission records to use a taxonomy for tracking the status of the commission
+ * Upgrades all commission records to use a taxonomy for tracking
+ * the status of the commission
  *
- * @since 2.8
+ * @since 2.0.0
  * @return void
  */
-function eddcr_upgrade_post_meta() {
-
-	if( ! current_user_can( 'manage_shop_settings' ) ) {
+function edd_cr_upgrade_post_meta() {
+	if ( ! current_user_can( 'manage_shop_settings' ) ) {
 		return;
 	}
 
@@ -65,12 +77,10 @@ function eddcr_upgrade_post_meta() {
 
 	$items = get_posts( $args );
 
-	if( $items ) {
+	if ( $items ) {
 
-		// items found so upgrade them
-
-		foreach( $items as $post_id ) {
-
+		// Items found so upgrade them
+		foreach ( $items as $post_id ) {
 			$restricted_to = get_post_meta( $post_id, '_edd_cr_restricted_to', true );
 			$price_id      = get_post_meta( $post_id, '_edd_cr_restricted_to_variable', true );
 
@@ -83,7 +93,6 @@ function eddcr_upgrade_post_meta() {
 			update_post_meta( $post_id, '_edd_cr_restricted_to', $args );
 
 			add_post_meta( $restricted_to, '_edd_cr_protected_post', $post_id );
-
 		}
 
 		$step++;
@@ -95,11 +104,8 @@ function eddcr_upgrade_post_meta() {
 		), admin_url( 'index.php' ) );
 
 		wp_safe_redirect( $redirect ); exit;
-
 	} else {
-
 		// No more items found, finish up
-
 		update_option( 'eddcr_version', EDD_CONTENT_RESTRICTION_VER );
 		delete_option( 'edd_doing_upgrade' );
 
@@ -107,4 +113,4 @@ function eddcr_upgrade_post_meta() {
 	}
 
 }
-add_action( 'edd_upgrade_cr_post_meta', 'eddcr_upgrade_post_meta' );
+add_action( 'edd_upgrade_cr_post_meta', 'edd_cr_upgrade_post_meta' );

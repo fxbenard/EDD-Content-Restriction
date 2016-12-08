@@ -3,7 +3,7 @@
  * Plugin Name:     Easy Digital Downloads - Content Restriction
  * Plugin URI:      https://easydigitaldownloads.com/downloads/content-restriction/
  * Description:     Allows you to restrict content from posts, pages, and custom post types to only those users who have purchased certain products. Also includes bbPress support.
- * Version:         2.1.5
+ * Version:         2.2
  * Author:          Easy Digital Downloads
  * Author URI:      https://easydigitaldownloads.com
  * Text Domain:     edd-cr
@@ -13,7 +13,9 @@
 
 
 // Exit if accessed directly
-if( ! defined( 'ABSPATH' ) ) exit;
+if( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 
 if( ! class_exists( 'EDD_Content_Restriction' ) ) {
@@ -63,7 +65,7 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 		 */
 		private function setup_constants() {
 			// Plugin version
-			define( 'EDD_CONTENT_RESTRICTION_VER', '2.1.5' );
+			define( 'EDD_CONTENT_RESTRICTION_VER', '2.2' );
 
 			// Plugin path
 			define( 'EDD_CONTENT_RESTRICTION_DIR', plugin_dir_path( __FILE__ ) );
@@ -81,19 +83,20 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 		 * @return      void
 		 */
 		public function includes() {
-
 			if( is_admin() ) {
-
-				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/upgrades.php';
-
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/admin/metabox.php';
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/admin/settings/register.php';
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/admin/upgrades.php';
 			}
 
-			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/functions.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/misc-functions.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/user-functions.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/template-functions.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/ajax-functions.php';
-			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/metabox.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/scripts.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/filters.php';
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/shortcodes.php';
-			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/template-tags.php';
+			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/email-tags.php';
 
 			// Check for bbPress
 			if ( class_exists( 'bbPress' ) ) {
@@ -101,6 +104,11 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 			}
 
 			require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/modules/menus.php';
+
+			// Add integrations
+			if ( class_exists( 'EDD_Software_Licensing' ) ) {
+				require_once EDD_CONTENT_RESTRICTION_DIR . 'includes/integrations/edd-software-licensing.php';
+			}
 		}
 
 
@@ -228,6 +236,7 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 			}
 
 			return array_merge( $settings, $new_settings );
+
 		}
 	}
 }
@@ -243,7 +252,7 @@ if( ! class_exists( 'EDD_Content_Restriction' ) ) {
 function EDD_Content_Restriction_load() {
 	if ( ! class_exists( 'Easy_Digital_Downloads' ) ) {
 		if ( ! class_exists( 'EDD_Extension_Activation' ) ) {
-			require_once 'includes/class.extension-activation.php';
+			require_once 'includes/libraries/class.extension-activation.php';
 		}
 
 		$activation = new EDD_Extension_Activation( plugin_dir_path( __FILE__ ), basename( __FILE__ ) );
@@ -261,9 +270,7 @@ add_action( 'plugins_loaded', 'EDD_Content_Restriction_load' );
  * @return      void
  */
 function eddcr_install() {
-
 	EDD_Content_Restriction::instance();
 	add_option( 'eddcr_version', EDD_CONTENT_RESTRICTION_VER, '', false );
-
 }
 register_activation_hook( __FILE__, 'eddcr_install' );
