@@ -76,15 +76,18 @@ function edd_cr_pages_shortcode( $atts, $content = null ) {
 					continue;
 				}
 
-				$page_ids = wp_list_pluck( $restricted, 'ID' );
-				$pages    = array_unique( array_merge( $page_ids, $pages ) );
+				foreach ( $restricted as $download_pages ) {
+					foreach ( $download_pages as $page_id => $page_title ) {
+						$pages[ $page_id ] = $page_title;
+					}
+				}
 			}
 
 			if ( ! empty( $pages ) ) {
 				$content = '<ul class="edd_cr_pages">';
 
-				foreach ( $pages as $page_id ) {
-					$content .= '<li><a href="' . esc_url( get_permalink( $page_id ) ) . '">' . get_the_title( $page_id ) . '</a></li>';
+				foreach ( $pages as $page_id => $page_title ) {
+					$content .= '<li><a href="' . esc_url( get_permalink( $page_id ) ) . '">' . $page_title . '</a></li>';
 				}
 
 				$content .= '</ul>';
