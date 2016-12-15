@@ -83,6 +83,8 @@ function edd_cr_pages_shortcode( $atts, $content = null ) {
 				}
 			}
 
+			$pages = array_filter( $pages );
+
 			if ( ! empty( $pages ) ) {
 				$content = '<ul class="edd_cr_pages">';
 
