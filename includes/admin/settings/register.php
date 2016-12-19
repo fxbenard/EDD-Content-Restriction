@@ -41,7 +41,7 @@ function edd_cr_add_settings( $settings ) {
 		'content-restriction' => apply_filters( 'edd_cr_settings', array(
 			array(
 				'id'    => 'edd_cr_settings',
-				'name'  => '<strong>' . __( 'Content Restriction', 'edd-cr' ) . '</strong>',
+				'name'  => '<strong>' . __( 'Content Restriction Settings', 'edd-cr' ) . '</strong>',
 				'desc'  => '',
 				'type'  => 'header'
 			),
