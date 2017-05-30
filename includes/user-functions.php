@@ -24,6 +24,8 @@ if( ! defined( 'ABSPATH' ) ) {
  * @return      array $return An array containing the status and optional message
  */
 function edd_cr_user_can_access( $user_id = false, $restricted_to, $post_id = false ) {
+
+	$message          = '';
 	$has_access       = false;
 	$restricted_count = count( $restricted_to );
 	$products         = array();
